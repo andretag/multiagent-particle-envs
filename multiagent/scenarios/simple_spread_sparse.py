@@ -100,3 +100,14 @@ class Scenario(BaseScenario):
             comm.append(other.state.c)
             other_pos.append(other.state.p_pos - agent.state.p_pos)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + comm)
+
+    def done(self, agent, world):
+        occupied_landmarks = 0
+        for l in world.landmarks:
+            dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
+            if min(dists) < agent.size:
+                occupied_landmarks += 1
+        if occupied_landmarks == len(world.landmarks):
+            return True
+        else:
+            return False
