@@ -8,8 +8,8 @@ class Scenario(BaseScenario):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        num_agents = 3
-        num_landmarks = 3
+        num_agents = 2
+        num_landmarks = 2
         world.collaborative = True
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -52,13 +52,15 @@ class Scenario(BaseScenario):
         for l in world.landmarks:
             dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
             min_dists += min(dists)
-            rew -= min(dists)
-            if min(dists) < 0.1:
+            if min(dists) < agent.size:
                 occupied_landmarks += 1
+        if occupied_landmarks == len(world.landmarks):
+            rew = 1
+        else:
+            rew = 0
         if agent.collide:
             for a in world.agents:
                 if self.is_collision(a, agent):
-                    rew -= 1
                     collisions += 1
         return (rew, collisions, min_dists, occupied_landmarks)
 
@@ -69,17 +71,16 @@ class Scenario(BaseScenario):
         return True if dist < dist_min else False
 
     def reward(self, agent, world):
-        # Agents are rewarded based on whether or not agent is at landmark, penalized for collisions
-        rew = 0
+        # Agents are rewarded based on whether or not all landmarks are reached
+        occupied_landmarks = 0
         for l in world.landmarks:
             dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
             if min(dists) < agent.size:
-                rew += 1
-        if agent.collide:
-            for a in world.agents:
-                if self.is_collision(a, agent) and a != agent:
-                    rew -= 1
-        return rew
+                occupied_landmarks += 1
+        if occupied_landmarks == len(world.landmarks):
+            return 1
+        else:
+            return 0
 
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
