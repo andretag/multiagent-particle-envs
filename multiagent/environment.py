@@ -1,5 +1,6 @@
 import gym
-from gym import spaces
+import random
+import gym.spaces as spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
 from multiagent.multi_discrete import MultiDiscrete
@@ -14,7 +15,6 @@ class MultiAgentEnv(gym.Env):
     def __init__(self, world, reset_callback=None, reward_callback=None,
                  observation_callback=None, info_callback=None,
                  done_callback=None, shared_viewer=True):
-
         self.world = world
         self.agents = self.world.policy_agents
         # set required vectorized gym env property
@@ -76,6 +76,11 @@ class MultiAgentEnv(gym.Env):
         else:
             self.viewers = [None] * self.n
         self._reset_render()
+
+    def seed(self, seed):
+        # TODO dkk: Double check whether below is sufficient for seeding
+        random.seed(seed)
+        np.random.seed
 
     def step(self, action_n):
         obs_n = []
