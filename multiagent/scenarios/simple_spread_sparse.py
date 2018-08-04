@@ -65,7 +65,7 @@ class Scenario(BaseScenario):
         if occupied_landmarks == len(world.landmarks):
             rew = 1
         else:
-            rew = 0
+            rew = -0.01
         if agent.collide:
             for a in world.agents:
                 if self.is_collision(a, agent):
@@ -88,7 +88,7 @@ class Scenario(BaseScenario):
         if occupied_landmarks == len(world.landmarks):
             return 1
         else:
-            return 0
+            return -0.01
 
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame

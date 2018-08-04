@@ -26,7 +26,7 @@ class MultiAgentEnv(gym.Env):
         self.info_callback = info_callback
         self.done_callback = done_callback
         # environment parameters
-        self.discrete_action_space = True
+        self.discrete_action_space = False  # NOTE For MADDPG, this has to be set to True
         # if true, action is a number 0...N, otherwise action is a one-hot N-dimensional vector
         self.discrete_action_input = False
         # if true, even the action is continuous, action will be performed discretely
@@ -83,6 +83,8 @@ class MultiAgentEnv(gym.Env):
         np.random.seed
 
     def step(self, action_n):
+        # action_n = [action_n]  # NOTE dkk Required for single agent rl
+
         obs_n = []
         reward_n = []
         done_n = []
@@ -98,7 +100,6 @@ class MultiAgentEnv(gym.Env):
             obs_n.append(self._get_obs(agent))
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
-
             info_n['n'].append(self._get_info(agent))
 
         # all agents get total reward in cooperative case
@@ -107,6 +108,7 @@ class MultiAgentEnv(gym.Env):
             reward_n = [reward] * self.n
 
         return obs_n, reward_n, done_n, info_n
+        # return obs_n[0], reward_n[0], done_n[0], info_n  # NOTE dkk Required for single agent rl
 
     def reset(self):
         # reset world
@@ -119,6 +121,7 @@ class MultiAgentEnv(gym.Env):
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
         return obs_n
+        # return obs_n[0]  # NOTE dkk Required for single agent rl
 
     # get info used for benchmarking
     def _get_info(self, agent):
@@ -180,7 +183,7 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
                     agent.action.u = action[0]
-            sensitivity = 5.0
+            sensitivity = 2.0
             if agent.accel is not None:
                 sensitivity = agent.accel
             agent.action.u *= sensitivity
