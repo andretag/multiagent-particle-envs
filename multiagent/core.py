@@ -55,6 +55,11 @@ class Landmark(Entity):
      def __init__(self):
         super(Landmark, self).__init__()
 
+# properties of goal entities
+class Goal(Entity):
+     def __init__(self):
+        super(Goal, self).__init__()
+
 # properties of agent entities
 class Agent(Entity):
     def __init__(self):
@@ -84,6 +89,7 @@ class World(object):
         # list of agents and entities (can change at execution-time!)
         self.agents = []
         self.landmarks = []
+        self.goals = None
         # communication channel dimensionality
         self.dim_c = 0
         # position dimensionality

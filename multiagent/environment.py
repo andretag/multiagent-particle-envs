@@ -229,13 +229,19 @@ class MultiAgentEnv(gym.Env):
                 self.viewers[i] = rendering.Viewer(700,700)
 
         # create rendering geometry
+        if self.world.goals is not None:
+            vis_entities = self.world.entities + self.world.goals
+        else:
+            vis_entities = self.world.entities
+
         if self.render_geoms is None:
             # import rendering only if we need it (and don't import for headless machines)
             #from gym.envs.classic_control import rendering
             from multiagent import rendering
             self.render_geoms = []
             self.render_geoms_xform = []
-            for entity in self.world.entities:
+
+            for entity in vis_entities:
                 geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
@@ -263,7 +269,7 @@ class MultiAgentEnv(gym.Env):
                 pos = self.agents[i].state.p_pos
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
             # update geometry positions
-            for e, entity in enumerate(self.world.entities):
+            for e, entity in enumerate(vis_entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
