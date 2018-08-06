@@ -63,7 +63,7 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
         for i, goal in enumerate(world.goals):
-            goal.state.p_pos = np.zeros(world.dim_p)
+            goal.state.p_pos = np.zeros(world.dim_p) - 2  # Initialize outside of the box
             goal.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
