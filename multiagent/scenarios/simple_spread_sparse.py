@@ -4,7 +4,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, num_agents=1):
+    def make_world(self, num_agents=1, collide=True):
         world = World()
 
         # set any world properties first
@@ -18,7 +18,7 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = False
+            agent.collide = collide
             agent.silent = True
             agent.size = 0.15
 
