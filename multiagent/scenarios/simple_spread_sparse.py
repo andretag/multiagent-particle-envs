@@ -18,7 +18,7 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = True
+            agent.collide = False
             agent.silent = True
             agent.size = 0.15
 
@@ -44,13 +44,27 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         # random properties for agents
         for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.35, 0.35, 0.85])
+            if i == 0:
+                agent.color = np.array([1.0, 0.0, 0.0])
+            elif i == 1:
+                agent.color = np.array([0.0, 1.0, 0.0])
+            elif i == 2:
+                agent.color = np.array([0.0, 0.0, 1.0])
+            else:
+                raise NotImplementedError()
 
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
 
         for i, goal in enumerate(world.goals):
-            goal.color = np.array([0.0, 0.0, 1.0])
+            if i == 0:
+                goal.color = np.array([1.0, 0.0, 0.0])
+            elif i == 1:
+                goal.color = np.array([0.0, 1.0, 0.0])
+            elif i == 2:
+                goal.color = np.array([0.0, 0.0, 1.0])
+            else:
+                raise NotImplementedError()
 
         # set random initial states
         for agent in world.agents:
@@ -100,7 +114,7 @@ class Scenario(BaseScenario):
             if min(dists) < agent.size:
                 occupied_landmarks += 1
         if occupied_landmarks == len(world.landmarks):
-            return 1
+            return 1.
         else:
             return -0.01
 
