@@ -74,15 +74,35 @@ class Scenario(BaseScenario):
         # world.agents[0].state.p_pos = np.array([-0.1, 0.0])
         # world.agents[1].state.p_pos = np.array([+0.1, 0.0])
 
+        # For landmark, we make sure that their distance is at least some size
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
-        world.landmarks[0].state.p_pos = np.array([-0.8, 0.0])
-        world.landmarks[1].state.p_pos = np.array([+0.8, 0.0])
+
+        while self.check_landmark_dist(world, agent.size * 2) is False:
+            for i, landmark in enumerate(world.landmarks):
+                landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+                landmark.state.p_vel = np.zeros(world.dim_p)
+        
+        # world.landmarks[0].state.p_pos = np.array([-0.8, 0.0])
+        # world.landmarks[1].state.p_pos = np.array([+0.8, 0.0])
 
         for i, goal in enumerate(world.goals):
             goal.state.p_pos = np.zeros(world.dim_p) - 2  # Initialize outside of the box
             goal.state.p_vel = np.zeros(world.dim_p)
+
+    def check_landmark_dist(self, world, size):
+        for i, landmark_i in enumerate(world.landmarks):
+            pos_i = landmark_i.state.p_pos
+
+            for j, landmark_j in enumerate(world.landmarks):
+                if i != j:
+                    pos_j = landmark_j.state.p_pos
+                    dist = np.sqrt(np.sum(np.square(pos_i - pos_j)))
+                    if dist < size:
+                        return False
+
+        return True
 
     def benchmark_data(self, agent, world):
         rew = 0
