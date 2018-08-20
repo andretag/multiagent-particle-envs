@@ -20,7 +20,7 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = collide
             agent.silent = True
-            agent.size = 0.25
+            agent.size = 0.50
 
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
@@ -120,7 +120,7 @@ class Scenario(BaseScenario):
         if occupied_landmarks == len(world.landmarks):
             return 1.
         else:
-            return -0.01
+            return 0.
 
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
