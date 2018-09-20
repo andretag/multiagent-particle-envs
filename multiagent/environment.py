@@ -78,13 +78,10 @@ class MultiAgentEnv(gym.Env):
         self._reset_render()
 
     def seed(self, seed):
-        # TODO dkk: Double check whether below is sufficient for seeding
         random.seed(seed)
-        np.random.seed
+        np.random.seed(seed)
 
     def step(self, action_n):
-        # action_n = [action_n]  # NOTE dkk Required for single agent rl
-
         obs_n = []
         reward_n = []
         done_n = []
@@ -108,7 +105,6 @@ class MultiAgentEnv(gym.Env):
             reward_n = [reward] * self.n
 
         return obs_n, reward_n, done_n, info_n
-        # return obs_n[0], reward_n[0], done_n[0], info_n  # NOTE dkk Required for single agent rl
 
     def reset(self):
         # reset world
