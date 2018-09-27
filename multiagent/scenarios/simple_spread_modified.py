@@ -15,7 +15,7 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = True
+            agent.collide = False
             agent.silent = True
             agent.size = 0.15
         # add landmarks
@@ -29,6 +29,7 @@ class Scenario(BaseScenario):
         return world
 
     def reset_world(self, world):
+        # TODO dk: consider initializing them sufficiently far from each other
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.35, 0.35, 0.85])
