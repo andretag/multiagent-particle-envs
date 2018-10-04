@@ -133,8 +133,8 @@ class World(object):
         p_force = [None] * len(self.entities)
         # apply agent physical controls
         p_force = self.apply_action_force(p_force)
-        # apply wall forces
-        p_force = self.apply_wall_force(p_force)
+        # # apply wall forces 
+        # p_force = self.apply_wall_force(p_force)  # NOTE Disabled wall force
         # apply environment forces
         p_force = self.apply_environment_force(p_force)
         # integrate physical state
@@ -163,8 +163,8 @@ class World(object):
     # gather physical forces acting on entities
     def apply_environment_force(self, p_force):
         # simple (but inefficient) collision response
-        for a,entity_a in enumerate(self.entities):
-            for b,entity_b in enumerate(self.entities):
+        for a, entity_a in enumerate(self.entities):
+            for b, entity_b in enumerate(self.entities):
                 if(b <= a): continue
                 [f_a, f_b] = self.get_collision_force(entity_a, entity_b)
                 if(f_a is not None):
@@ -175,10 +175,25 @@ class World(object):
                     p_force[b] = f_b + p_force[b]        
         return p_force
 
+    def check_all_agent_in_contact(self):
+        all_contact = True
+        obstacle = self.landmarks[0]
+        contact_threshold = 0.005
+
+        for i, agent in enumerate(self.agents):
+            [f_a, f_b] = self.get_collision_force(agent, obstacle)
+            if abs(f_a[0]) < contact_threshold:
+                all_contact = False
+
+        return all_contact
+
     # integrate physical state
     def integrate_state(self, p_force):
-        for i,entity in enumerate(self.entities):
+        for i, entity in enumerate(self.entities):
             if not entity.movable: continue
+            # TODO dk: Change landmark name to obstacle
+            if "landmark" in entity.name and not self.check_all_agent_in_contact():
+                continue
             entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
             if (p_force[i] is not None):
                 entity.state.p_vel += (p_force[i] / entity.mass) * self.dt
