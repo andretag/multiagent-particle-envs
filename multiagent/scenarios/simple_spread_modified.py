@@ -1,5 +1,5 @@
 import numpy as np
-from multiagent.core import World, Agent, Landmark
+from multiagent.core import World, Agent, Landmark, Goal
 from multiagent.scenario import BaseScenario
 
 
@@ -10,6 +10,7 @@ class Scenario(BaseScenario):
         world.dim_c = 2
         num_agents = 2
         num_landmarks = num_agents
+        num_goals = num_agents
         world.collaborative = True
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -24,6 +25,14 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
+
+        # add goals (used only for vis)                                                                                                                 
+        world.goals = [Goal() for i in range(num_goals)]
+        for i, goal in enumerate(world.goals):
+            goal.name = 'goal %d' % i
+            goal.collide = False
+            goal.movable = False
+
         # make initial conditions
         self.reset_world(world)
         return world
@@ -32,10 +41,29 @@ class Scenario(BaseScenario):
         # TODO dk: consider initializing them sufficiently far from each other
         # random properties for agents
         for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.35, 0.35, 0.85])
+            if i == 0:
+                agent.color = np.array([1.0, 0.0, 0.0])
+            elif i == 1:
+                agent.color = np.array([0.0, 1.0, 0.0])
+            elif i == 2:
+                agent.color = np.array([0.0, 0.0, 1.0])
+            else:
+                raise NotImplementedError()
+
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
+
+        for i, goal in enumerate(world.goals):                                                                                                          
+            if i == 0:
+                goal.color = np.array([1.0, 0.0, 0.0])
+            elif i == 1:
+                goal.color = np.array([0.0, 1.0, 0.0])
+            elif i == 2:
+                goal.color = np.array([0.0, 0.0, 1.0])
+            else:
+                raise NotImplementedError()
+
         # set random initial states
         for agent in world.agents:
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
@@ -44,6 +72,10 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
+
+        for i, goal in enumerate(world.goals):
+            goal.state.p_pos = np.zeros(world.dim_p) - 2  # NOTE Initialize outside of the box
+            goal.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
         rew = 0
