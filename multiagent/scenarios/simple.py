@@ -1,5 +1,5 @@
 import numpy as np
-from multiagent.core import World, Agent, Landmark
+from multiagent.core import World, Agent, Landmark, Goal
 from multiagent.scenario import BaseScenario
 
 
@@ -18,6 +18,13 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
+        # add goals (used only for vis)
+        world.goals = [Goal() for i in range(1)]
+        for i, goal in enumerate(world.goals):
+            goal.name = 'goal %d' % i
+            goal.collide = False
+            goal.movable = False
+
         # make initial conditions
         self.reset_world(world)
         return world
@@ -42,6 +49,10 @@ class Scenario(BaseScenario):
             while self.check_distance(world.agents, landmark.state.p_pos):
                 landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
+        for i, goal in enumerate(world.goals):
+            goal.state.p_pos = np.zeros(world.dim_p) - 2  # NOTE Initialize outside of the box
+            goal.state.p_vel = np.zeros(world.dim_p)
+            goal.color = np.array([0.0, 1.0, 0.0])
 
     def check_distance(self, agents, landmark_p_pos):
         assert len(agents) == 1
