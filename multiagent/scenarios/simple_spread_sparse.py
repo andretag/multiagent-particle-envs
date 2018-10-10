@@ -20,7 +20,7 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = False
             agent.silent = True
-            agent.size = 0.30
+            agent.size = 0.20
 
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
@@ -65,14 +65,18 @@ class Scenario(BaseScenario):
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
+        # world.agents[0].state.p_pos = np.array([-0.1, 0.0])
+        # world.agents[1].state.p_pos = np.array([+0.1, 0.0])
 
         for i, landmark in enumerate(world.landmarks):
             landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
-        while self.check_landmark_dist(world, th=agent.size) is False:
+        while self.check_landmark_dist(world, th=agent.size * 2.5) is False:
             for i, landmark in enumerate(world.landmarks):
                 landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
                 landmark.state.p_vel = np.zeros(world.dim_p)
+        # world.landmarks[0].state.p_pos = np.array([-0.8, 0.0])
+        # world.landmarks[1].state.p_pos = np.array([+0.8, 0.0])
 
         for i, goal in enumerate(world.goals):
             goal.state.p_pos = np.zeros(world.dim_p) - 2  # NOTE Initialize outside of the box
@@ -89,7 +93,7 @@ class Scenario(BaseScenario):
         if occupied_landmarks == len(world.landmarks):
             return 1.
         else:
-            return 0.
+            return -0.01
 
     def check_landmark_dist(self, world, th):
         for i, landmark_i in enumerate(world.landmarks):
@@ -98,7 +102,7 @@ class Scenario(BaseScenario):
                 if i != j:
                     pos_j = landmark_j.state.p_pos
                     dist = np.sqrt(np.sum(np.square(pos_i - pos_j)))
-                    if dist < th + 0.05:
+                    if dist < th:
                         return False
         return True
 
@@ -106,13 +110,15 @@ class Scenario(BaseScenario):
         # get positions of all entities in this agent's reference frame
         entity_pos = []
         for entity in world.landmarks:  # world.entities:
-            entity_pos.append(entity.state.p_pos - agent.state.p_pos)
+            # entity_pos.append(entity.state.p_pos - agent.state.p_pos)
+            entity_pos.append(entity.state.p_pos)
 
         other_pos = []
         for other in world.agents:
             if other is agent: 
                 continue
             assert np.sum(other.state.c) == 0.  # NOTE dk: Removed comm as not used in this scenario
-            other_pos.append(other.state.p_pos - agent.state.p_pos)
+            # other_pos.append(other.state.p_pos - agent.state.p_pos)
+            other_pos.append(other.state.p_pos)
 
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
