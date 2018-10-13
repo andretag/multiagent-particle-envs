@@ -175,10 +175,24 @@ class World(object):
                     p_force[b] = f_b + p_force[b]        
         return p_force
 
+    def check_all_agent_in_contact(self, box):
+        all_contact = True
+        contact_threshold = 0.005
+
+        for i, agent in enumerate(self.agents):
+            [f_a, f_b] = self.get_collision_force(agent, box)
+            if abs(f_a[0]) < contact_threshold:
+                all_contact = False
+
+        return all_contact
+
     # integrate physical state
     def integrate_state(self, p_force):
-        for i,entity in enumerate(self.entities):
-            if not entity.movable: continue
+        for i, entity in enumerate(self.entities):
+            if not entity.movable:
+                continue
+            if "box" in entity.name and not self.check_all_agent_in_contact(entity):
+                continue
             entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
             if (p_force[i] is not None):
                 entity.state.p_vel += (p_force[i] / entity.mass) * self.dt

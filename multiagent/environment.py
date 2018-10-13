@@ -240,7 +240,7 @@ class MultiAgentEnv(gym.Env):
             for entity in vis_entities:
                 geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
-                if 'agent' in entity.name:
+                if 'goal' in entity.name or "target" in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)
                 else:
                     geom.set_color(*entity.color)
