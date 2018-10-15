@@ -104,6 +104,9 @@ class MultiAgentEnv(gym.Env):
         if self.shared_reward:
             reward_n = [reward] * self.n
 
+        if self.n == 2:
+            assert reward_n[0] == reward_n[1]
+
         return obs_n, reward_n, done_n, info_n
 
     def reset(self):
