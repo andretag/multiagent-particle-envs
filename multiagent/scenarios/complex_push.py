@@ -18,9 +18,13 @@ class Scenario(BaseScenario):
         # set mode
         self.mode = mode
         if self.mode == 0:
-            n_box = 1
+            n_box = 1  # One box and pushing to left
         elif self.mode == 1:
-            n_box = 2
+            n_box = 2  # Two box and pushing to left
+        elif self.mode == 2:
+            n_box = 2  # Two box and pushing to right
+        elif self.mode == 3:
+            n_box = 2  # Two box and pushing to right and left
         else:
             raise ValueError()
 
@@ -107,11 +111,17 @@ class Scenario(BaseScenario):
             else:
                 raise ValueError()
 
-        # Move box0 to target0
+        # Move box0 to target0 (One Box)
         if self.mode == 0:
             dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
-        # Move box0 to target0 & Move box1 to target1
+        # Move box0 to target0 (Two box)
         elif self.mode == 1:
+            dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
+        # Move box1 to target1
+        elif self.mode == 2:
+            dist = np.sum(np.square(box1.state.p_pos - target1.state.p_pos))
+        # Move box0 to target0 & Move box1 to target1
+        elif self.mode == 3:
             dist1 = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
             dist2 = np.sum(np.square(box1.state.p_pos - target1.state.p_pos))
             dist = dist1 + dist2
