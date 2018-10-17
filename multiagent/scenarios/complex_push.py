@@ -4,7 +4,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self):
+    def make_world(self, mode):
         world = World()
 
         # add agents
@@ -16,11 +16,13 @@ class Scenario(BaseScenario):
             agent.size = 0.1
 
         # set mode
-        self.mode = 0
+        self.mode = mode
         if self.mode == 0:
             n_box = 1
+        elif self.mode == 1:
+            n_box = 2
         else:
-            raise NotImplementedError()
+            raise ValueError()
 
         # add boxes
         boxes = [Landmark() for _ in range(n_box)]
@@ -34,7 +36,7 @@ class Scenario(BaseScenario):
             world.landmarks.append(box)
 
         # add targets
-        targets = [Landmark() for _ in range(2)]
+        targets = [Landmark() for _ in range(n_box)]
         for i, target in enumerate(targets):
             target.name = 'target %d' % i
             target.collide = False
@@ -44,7 +46,7 @@ class Scenario(BaseScenario):
             world.landmarks.append(target)
 
         # add goals (used only for vis)
-        world.goals = [Goal() for i in range(2)]
+        world.goals = [Goal() for i in range(len(world.agents))]
         for i, goal in enumerate(world.goals):
             goal.name = 'goal %d' % i
             goal.collide = False
@@ -73,29 +75,22 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
 
-            landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.25, 0.0])
+                landmark.state.p_pos = np.array([-0.35, 0.0])
             elif "box" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.25, 0.0])
+                landmark.state.p_pos = np.array([+0.35, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.0])
+                landmark.state.p_pos = np.array([-0.90, 0.0])
             elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.85, 0.0])
+                landmark.state.p_pos = np.array([+0.90, 0.0])
             else:
                 raise ValueError()
 
         # random properties for goals (vis purpose)
         for i, goal in enumerate(world.goals):
-            if i == 0:
-                goal.color = np.array([1.0, 0.0, 0.0])
-            elif i == 1:
-                goal.color = np.array([0.0, 1.0, 0.0])
-            else:
-                raise NotImplementedError()
-
+            goal.color = world.agents[i].color
             goal.state.p_pos = np.zeros(world.dim_p) - 2  # Initialize outside of the box
             goal.state.p_vel = np.zeros(world.dim_p)
 
@@ -115,14 +110,13 @@ class Scenario(BaseScenario):
         # Move box0 to target0
         if self.mode == 0:
             dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
-        # Move box1 to target1
-        elif self.mode == 1:
-            dist = np.sum(np.square(box1.state.p_pos - target1.state.p_pos))
         # Move box0 to target0 & Move box1 to target1
-        elif self.mode == 2:
+        elif self.mode == 1:
             dist1 = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
             dist2 = np.sum(np.square(box1.state.p_pos - target1.state.p_pos))
             dist = dist1 + dist2
+        else:
+            raise ValueError()
         return -dist
 
     def observation(self, agent, world):
@@ -131,10 +125,19 @@ class Scenario(BaseScenario):
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos)
 
+        # Add Boxes velocity
+        # NOTE This information might be adding too much info and making the env too easy
+        # Consider removing this info
+        box_vel = []
+        for entity in world.landmarks:
+            if "box" in entity.name:
+                box_vel.append(entity.state.p_vel)
+
+        # Add other agent position
         other_pos = []
         for other in world.agents:
             if other is agent: 
                 continue
             other_pos.append(other.state.p_pos)
 
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + box_vel + other_pos)
