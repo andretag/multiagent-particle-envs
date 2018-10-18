@@ -78,17 +78,16 @@ class Scenario(BaseScenario):
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
-
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.35, 0.0])
+                landmark.state.p_pos = np.array([-0.30, 0.0])
             elif "box" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.35, 0.0])
+                landmark.state.p_pos = np.array([+0.30, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.90, 0.0])
+                landmark.state.p_pos = np.array([-0.85, 0.0])
             elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.90, 0.0])
+                landmark.state.p_pos = np.array([+0.85, 0.0])
             else:
                 raise ValueError()
 
@@ -127,6 +126,7 @@ class Scenario(BaseScenario):
             dist = dist1 + dist2
         else:
             raise ValueError()
+
         return -dist
 
     def observation(self, agent, world):
