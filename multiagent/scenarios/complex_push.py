@@ -29,8 +29,8 @@ class Scenario(BaseScenario):
             raise ValueError()
 
         # add boxes
-        boxes = [Landmark() for _ in range(n_box)]
-        for i, box in enumerate(boxes):
+        self.boxes = [Landmark() for _ in range(n_box)]
+        for i, box in enumerate(self.boxes):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
@@ -40,8 +40,8 @@ class Scenario(BaseScenario):
             world.landmarks.append(box)
 
         # add targets
-        targets = [Landmark() for _ in range(n_box)]
-        for i, target in enumerate(targets):
+        self.targets = [Landmark() for _ in range(n_box)]
+        for i, target in enumerate(self.targets):
             target.name = 'target %d' % i
             target.collide = False
             target.movable = False
@@ -134,14 +134,7 @@ class Scenario(BaseScenario):
         entity_pos = []
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos)
-
-        # Add Boxes velocity
-        # NOTE This information might be adding too much info and making the env too easy
-        # Consider removing this info
-        box_vel = []
-        for entity in world.landmarks:
-            if "box" in entity.name:
-                box_vel.append(entity.state.p_vel)
+        assert len(entity_pos) == len(self.boxes) + len(self.targets)
 
         # Add other agent position
         other_pos = []
@@ -150,4 +143,4 @@ class Scenario(BaseScenario):
                 continue
             other_pos.append(other.state.p_pos)
 
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + box_vel + other_pos)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
