@@ -5,6 +5,7 @@ from gym.envs.registration import EnvSpec
 import numpy as np
 from multiagent.multi_discrete import MultiDiscrete
 
+
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
 class MultiAgentEnv(gym.Env):
@@ -241,7 +242,11 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms_xform = []
 
             for entity in vis_entities:
-                geom = rendering.make_circle(entity.size)
+                if "border" in entity.name:
+                    geom = rendering.make_polygon(entity.shape)
+                else:
+                    geom = rendering.make_circle(entity.size)
+
                 xform = rendering.Transform()
                 if 'goal' in entity.name or "target" in entity.name:
                     geom.set_color(*entity.color, alpha=0.5)

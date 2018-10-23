@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # physical/external base state of all entites
 class EntityState(object):
     def __init__(self):
@@ -8,12 +9,14 @@ class EntityState(object):
         # physical velocity
         self.p_vel = None
 
+
 # state of agents (including communication and internal/mental state)
 class AgentState(EntityState):
     def __init__(self):
         super(AgentState, self).__init__()
         # communication utterance
         self.c = None
+
 
 # action of the agent
 class Action(object):
@@ -22,6 +25,7 @@ class Action(object):
         self.u = None
         # communication action
         self.c = None
+
 
 # properties and state of physical world entity
 class Entity(object):
@@ -50,15 +54,25 @@ class Entity(object):
     def mass(self):
         return self.initial_mass
 
+
 # properties of landmark entities
 class Landmark(Entity):
-     def __init__(self):
+    def __init__(self):
         super(Landmark, self).__init__()
+
 
 # properties of goal entities
 class Goal(Entity):
-     def __init__(self):
+    def __init__(self):
         super(Goal, self).__init__()
+
+
+# properties of Border entities
+class Border(Entity):
+    def __init__(self):
+        super(Border, self).__init__()
+        self.pos = None
+
 
 # properties of agent entities
 class Agent(Entity):
@@ -83,12 +97,14 @@ class Agent(Entity):
         # script behavior to execute
         self.action_callback = None
 
+
 # multi-agent world
 class World(object):
     def __init__(self):
         # list of agents and entities (can change at execution-time!)
         self.agents = []
         self.landmarks = []
+        self.borders = []
         self.goals = None
         # communication channel dimensionality
         self.dim_c = 0
@@ -112,7 +128,7 @@ class World(object):
     # return all entities in the world
     @property
     def entities(self):
-        return self.agents + self.landmarks
+        return self.agents + self.landmarks + self.borders
 
     # return all agents controllable by external policies
     @property
