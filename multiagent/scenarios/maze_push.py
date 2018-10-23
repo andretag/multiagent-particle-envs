@@ -125,7 +125,7 @@ class Scenario(BaseScenario):
                 high=0.)
             self.box.state.p_pos[1] = np.random.uniform(
                 low=self.boundary_pos[1],
-                high=1.)
+                high=1. - self.box.size + 0.05)
 
         # reset properties for target
         self.target.state.p_vel = np.zeros(world.dim_p)
