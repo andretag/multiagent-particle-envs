@@ -119,13 +119,7 @@ class Scenario(BaseScenario):
         if self.mode == 0 or self.mode == 2:
             self.box.state.p_pos = np.array([self.boundary_pos[1], 0.])
         elif self.mode == 1:
-            self.box.state.p_pos = np.zeros(world.dim_p)
-            self.box.state.p_pos[0] = np.random.uniform(
-                low=0. - 0.05,
-                high=0.)
-            self.box.state.p_pos[1] = np.random.uniform(
-                low=self.boundary_pos[1],
-                high=1. - self.box.size + 0.05)
+            self.box.state.p_pos = np.array([0., self.boundary_pos[1]])
 
         # reset properties for target
         self.target.state.p_vel = np.zeros(world.dim_p)
