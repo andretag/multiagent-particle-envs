@@ -26,7 +26,7 @@ class Scenario(BaseScenario):
             landmark.collide = False
             landmark.movable = False
 
-        # add goals (used only for vis)                                                                                                                 
+        # add goals (used only for vis)
         world.goals = [Goal() for i in range(num_goals)]
         for i, goal in enumerate(world.goals):
             goal.name = 'goal %d' % i
@@ -54,7 +54,7 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
 
-        for i, goal in enumerate(world.goals):                                                                                                          
+        for i, goal in enumerate(world.goals):
             if i == 0:
                 goal.color = np.array([1.0, 0.0, 0.0])
             elif i == 1:
@@ -134,10 +134,7 @@ class Scenario(BaseScenario):
         for entity in world.landmarks:  # world.entities:
             # entity_pos.append(entity.state.p_pos - agent.state.p_pos)
             entity_pos.append(entity.state.p_pos)
-        # entity colors
-        entity_color = []
-        for entity in world.landmarks:  # world.entities:
-            entity_color.append(entity.color)
+
         # communication of all other agents
         comm = []
         other_pos = []
@@ -147,4 +144,5 @@ class Scenario(BaseScenario):
             comm.append(other.state.c)
             # other_pos.append(other.state.p_pos - agent.state.p_pos)
             other_pos.append(other.state.p_pos)
+
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
