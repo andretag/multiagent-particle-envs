@@ -4,7 +4,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, mode):
+    def make_world(self):
         world = World()
 
         # add agents
@@ -15,18 +15,7 @@ class Scenario(BaseScenario):
             agent.silent = True
             agent.size = 0.1
 
-        # set mode
-        self.mode = mode
-        if self.mode == 0:
-            n_box = 1  # One box and pushing to left
-        elif self.mode == 1:
-            n_box = 2  # Two box and pushing to left
-        elif self.mode == 2:
-            n_box = 2  # Two box and pushing to right
-        elif self.mode == 3:
-            n_box = 2  # Two box and pushing to right and left
-        else:
-            raise ValueError()
+        n_box = 1  # One box and pushing to left
 
         # add boxes
         self.boxes = [Landmark() for _ in range(n_box)]
@@ -81,13 +70,9 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.35, 0.0])
-            elif "box" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.35, 0.0])
+                landmark.state.p_pos = np.array([-0.25, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
                 landmark.state.p_pos = np.array([-0.85, 0.0])
-            elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.85, 0.0])
             else:
                 raise ValueError()
 
@@ -101,31 +86,13 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.landmarks):
             if "box" in landmark.name and landmark.index == 0:
                 box0 = landmark
-            elif "box" in landmark.name and landmark.index == 1:
-                box1 = landmark
             elif "target" in landmark.name and landmark.index == 0:
                 target0 = landmark
-            elif "target" in landmark.name and landmark.index == 1:
-                target1 = landmark
             else:
                 raise ValueError()
 
         # Move box0 to target0 (One Box)
-        if self.mode == 0:
-            dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
-        # Move box0 to target0 (Two box)
-        elif self.mode == 1:
-            dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
-        # Move box1 to target1
-        elif self.mode == 2:
-            dist = np.sum(np.square(box1.state.p_pos - target1.state.p_pos))
-        # Move box0 to target0 & Move box1 to target1
-        elif self.mode == 3:
-            dist1 = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
-            dist2 = np.sum(np.square(box1.state.p_pos - target1.state.p_pos))
-            dist = dist1 + dist2
-        else:
-            raise ValueError()
+        dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
 
         return -dist
 
