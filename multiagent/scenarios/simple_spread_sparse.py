@@ -62,21 +62,21 @@ class Scenario(BaseScenario):
                 raise NotImplementedError()
 
         for agent in world.agents:
-            agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+            # agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
-        # world.agents[0].state.p_pos = np.array([-0.1, 0.0])
-        # world.agents[1].state.p_pos = np.array([+0.1, 0.0])
+        world.agents[0].state.p_pos = np.array([-0.25, 0.8])
+        world.agents[1].state.p_pos = np.array([+0.25, 0.8])
 
         for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+            # landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
             landmark.state.p_vel = np.zeros(world.dim_p)
-        while self.check_landmark_dist(world, th=agent.size * 2.5) is False:
-            for i, landmark in enumerate(world.landmarks):
-                landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-                landmark.state.p_vel = np.zeros(world.dim_p)
-        # world.landmarks[0].state.p_pos = np.array([-0.8, 0.0])
-        # world.landmarks[1].state.p_pos = np.array([+0.8, 0.0])
+        # while self.check_landmark_dist(world, th=agent.size * 2.5) is False:
+        #     for i, landmark in enumerate(world.landmarks):
+        #         landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+        #         landmark.state.p_vel = np.zeros(world.dim_p)
+        world.landmarks[0].state.p_pos = np.array([-0.8, 0.0])
+        world.landmarks[1].state.p_pos = np.array([+0.8, 0.0])
 
         for i, goal in enumerate(world.goals):
             goal.state.p_pos = np.zeros(world.dim_p) - 2  # NOTE Initialize outside of the box
