@@ -93,7 +93,7 @@ class Scenario(BaseScenario):
         if occupied_landmarks == len(world.landmarks):
             return 1.
         else:
-            return -0.01
+            return 0.
 
     def check_landmark_dist(self, world, th):
         for i, landmark_i in enumerate(world.landmarks):
