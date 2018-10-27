@@ -123,7 +123,6 @@ class Scenario(BaseScenario):
         entity_pos = []
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos)
-            print(entity.name)
         assert len(entity_pos) == len(self.boxes) + len(self.targets)
 
         # Add other agent position
