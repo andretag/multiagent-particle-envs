@@ -36,7 +36,7 @@ class Scenario(BaseScenario):
             if box.index == 0:
                 box.initial_mass = 2.
             elif box.index == 1:
-                box.initial_mass = 10.
+                box.initial_mass = 6.
             else:
                 raise ValueError()
             world.landmarks.append(box)
@@ -83,9 +83,9 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.25, 0.0])
+                landmark.state.p_pos = np.array([-0.30, 0.0])
             elif "box" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([0.25, 0.0])
+                landmark.state.p_pos = np.array([0.30, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
                 landmark.state.p_pos = np.array([-0.85, 0.0])
             elif "target" in landmark.name and landmark.index == 1:
