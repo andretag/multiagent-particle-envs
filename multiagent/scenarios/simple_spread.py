@@ -40,15 +40,15 @@ class Scenario(BaseScenario):
         # set random initial states
         for i, landmark in enumerate(world.landmarks):
             if i == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.0])
+                landmark.state.p_pos = np.array([-0.75, 0.0])
             elif i == 1:
-                landmark.state.p_pos = np.array([+0.85, 0.0])
+                landmark.state.p_pos = np.array([+0.75, 0.0])
             else:
                 raise ValueError()
             landmark.state.p_vel = np.zeros(world.dim_p)
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = world.landmarks[i].state.p_pos + np.random.uniform(-0.15, 0.15, world.dim_p)
+            agent.state.p_pos = world.landmarks[i].state.p_pos + np.random.uniform(-0.25, 0.25, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
