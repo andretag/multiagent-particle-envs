@@ -1,6 +1,5 @@
 import gym
-import random
-import gym.spaces as spaces
+from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
 from multiagent.multi_discrete import MultiDiscrete
@@ -15,6 +14,7 @@ class MultiAgentEnv(gym.Env):
     def __init__(self, world, reset_callback=None, reward_callback=None,
                  observation_callback=None, info_callback=None,
                  done_callback=None, shared_viewer=True):
+
         self.world = world
         self.agents = self.world.policy_agents
         # set required vectorized gym env property
@@ -26,7 +26,7 @@ class MultiAgentEnv(gym.Env):
         self.info_callback = info_callback
         self.done_callback = done_callback
         # environment parameters
-        self.discrete_action_space = False  # NOTE For MADDPG, this has to be set to True
+        self.discrete_action_space = True
         # if true, action is a number 0...N, otherwise action is a one-hot N-dimensional vector
         self.discrete_action_input = False
         # if true, even the action is continuous, action will be performed discretely
@@ -77,10 +77,6 @@ class MultiAgentEnv(gym.Env):
             self.viewers = [None] * self.n
         self._reset_render()
 
-    def seed(self, seed):
-        random.seed(seed)
-        np.random.seed(seed)
-
     def step(self, action_n):
         obs_n = []
         reward_n = []
@@ -97,6 +93,7 @@ class MultiAgentEnv(gym.Env):
             obs_n.append(self._get_obs(agent))
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
+
             info_n['n'].append(self._get_info(agent))
 
         # all agents get total reward in cooperative case
@@ -117,7 +114,6 @@ class MultiAgentEnv(gym.Env):
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
         return obs_n
-        # return obs_n[0]  # NOTE dkk Required for single agent rl
 
     # get info used for benchmarking
     def _get_info(self, agent):
@@ -179,7 +175,7 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[1] += action[0][3] - action[0][4]
                 else:
                     agent.action.u = action[0]
-            sensitivity = 2.0
+            sensitivity = 5.0
             if agent.accel is not None:
                 sensitivity = agent.accel
             agent.action.u *= sensitivity
@@ -225,19 +221,13 @@ class MultiAgentEnv(gym.Env):
                 self.viewers[i] = rendering.Viewer(700,700)
 
         # create rendering geometry
-        if self.world.goals is not None:
-            vis_entities = self.world.entities + self.world.goals
-        else:
-            vis_entities = self.world.entities
-
         if self.render_geoms is None:
             # import rendering only if we need it (and don't import for headless machines)
             #from gym.envs.classic_control import rendering
             from multiagent import rendering
             self.render_geoms = []
             self.render_geoms_xform = []
-
-            for entity in vis_entities:
+            for entity in self.world.entities:
                 geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
@@ -265,7 +255,7 @@ class MultiAgentEnv(gym.Env):
                 pos = self.agents[i].state.p_pos
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
             # update geometry positions
-            for e, entity in enumerate(vis_entities):
+            for e, entity in enumerate(self.world.entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
