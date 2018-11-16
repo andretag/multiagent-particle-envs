@@ -58,12 +58,7 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
         for i, agent in enumerate(world.agents):
-            if i == 0:
-                agent.state.p_pos = np.array([-0.30, 0.0])
-            elif i == 1:
-                agent.state.p_pos = np.array([+0.30, 0.0])
-            else:
-                raise ValueError()
+            agent.state.p_pos = world.landmarks[i].state.p_pos + np.random.uniform(-0.25, +0.25, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
