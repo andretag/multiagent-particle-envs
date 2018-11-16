@@ -15,7 +15,7 @@ class Scenario(BaseScenario):
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = True
+            agent.collide = False
             agent.silent = True
             agent.size = 0.15
         # add landmarks
@@ -48,7 +48,12 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
         for i, agent in enumerate(world.agents):
-            agent.state.p_pos = world.landmarks[i].state.p_pos + np.random.uniform(-0.25, 0.25, world.dim_p)
+            if i == 0:
+                agent.state.p_pos = np.array([-0.2, 0.0])
+            elif i == 1:
+                agent.state.p_pos = np.array([+0.2, 0.0])
+            else:
+                raise ValueError()
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
