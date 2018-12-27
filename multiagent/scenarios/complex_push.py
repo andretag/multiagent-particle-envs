@@ -29,7 +29,7 @@ class Scenario(BaseScenario):
             world.landmarks.append(box)
 
         # add targets
-        self.targets = [Landmark() for _ in range(2)]
+        self.targets = [Landmark() for _ in range(1)]
         for i, target in enumerate(self.targets):
             target.name = 'target %d' % i
             target.collide = False
@@ -90,8 +90,6 @@ class Scenario(BaseScenario):
                 box0 = landmark
             elif "target" in landmark.name and landmark.index == 0:
                 target0 = landmark
-            elif "target" in landmark.name and landmark.index == 1:
-                target1 = landmark
             else:
                 raise ValueError()
 
