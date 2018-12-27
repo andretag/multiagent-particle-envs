@@ -15,9 +15,8 @@ class Scenario(BaseScenario):
             agent.silent = True
             agent.size = 0.1
 
-        n_box = 1  # One box and pushing to left
-
         # add boxes
+        n_box = 1  # NOTE One box and pushing to left
         self.boxes = [Landmark() for _ in range(n_box)]
         for i, box in enumerate(self.boxes):
             box.name = 'box %d' % i
@@ -29,7 +28,7 @@ class Scenario(BaseScenario):
             world.landmarks.append(box)
 
         # add targets
-        self.targets = [Landmark() for _ in range(1)]
+        self.targets = [Landmark() for _ in range(n_box)]
         for i, target in enumerate(self.targets):
             target.name = 'target %d' % i
             target.collide = False
@@ -73,8 +72,6 @@ class Scenario(BaseScenario):
                 landmark.state.p_pos = np.array([-0.25, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
                 landmark.state.p_pos = np.array([-0.85, 0.0])
-            elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.85, 0.0])
             else:
                 raise ValueError()
 
