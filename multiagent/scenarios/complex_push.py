@@ -15,9 +15,8 @@ class Scenario(BaseScenario):
             agent.silent = True
             agent.size = 0.1
 
-        n_box = 1  # One box and pushing to left
-
         # add boxes
+        n_box = 1  # One box and pushing to left
         self.boxes = [Landmark() for _ in range(n_box)]
         for i, box in enumerate(self.boxes):
             box.name = 'box %d' % i
@@ -90,8 +89,6 @@ class Scenario(BaseScenario):
                 box0 = landmark
             elif "target" in landmark.name and landmark.index == 0:
                 target0 = landmark
-            elif "target" in landmark.name and landmark.index == 1:
-                target1 = landmark
             else:
                 raise ValueError()
 
