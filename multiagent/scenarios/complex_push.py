@@ -89,6 +89,8 @@ class Scenario(BaseScenario):
                 box0 = landmark
             elif "target" in landmark.name and landmark.index == 0:
                 target0 = landmark
+            elif "target" in landmark.name and landmark.index == 1:
+                target1 = landmark
             else:
                 raise ValueError()
 
