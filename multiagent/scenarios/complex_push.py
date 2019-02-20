@@ -1,10 +1,30 @@
 import numpy as np
-from multiagent.core import World, Agent, Landmark, Goal
+from multiagent.core import World, Agent, Landmark
 from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self):
+    def make_world(self, mode):
+        """
+        mode0:
+        - Random agent loc
+        - Box starts at left side
+        - Target at right side
+
+        mode1:
+        - Random agent loc
+        - Box starts at right side
+        - Target at left side
+
+        mode2:
+        - Random agent loc
+        - Box at center
+        - Target at random
+        """
+        assert mode >= 0
+        assert mode <= 2
+        self.mode = mode
+
         world = World()
 
         # add agents
@@ -13,7 +33,7 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = True
             agent.silent = True
-            agent.size = 0.1
+            agent.size = 0.05
 
         # add boxes
         n_box = 1  # One box and pushing to left
@@ -22,13 +42,13 @@ class Scenario(BaseScenario):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
-            box.size = 0.25
+            box.size = 0.125
             box.initial_mass = 7.
             box.index = i
             world.landmarks.append(box)
 
         # add targets
-        self.targets = [Landmark() for _ in range(2)]
+        self.targets = [Landmark() for _ in range(n_box)]
         for i, target in enumerate(self.targets):
             target.name = 'target %d' % i
             target.collide = False
@@ -36,13 +56,6 @@ class Scenario(BaseScenario):
             target.size = 0.05
             target.index = i
             world.landmarks.append(target)
-
-        # add goals (used only for vis)
-        world.goals = [Goal() for i in range(len(world.agents))]
-        for i, goal in enumerate(world.goals):
-            goal.name = 'goal %d' % i
-            goal.collide = False
-            goal.movable = False
 
         # make initial conditions
         self.reset_world(world)
@@ -69,19 +82,32 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.25, 0.0])
+                if self.mode == 0:
+                    random_x = float(np.random.uniform(low=0.50, high=0.85, size=1))
+                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
+                elif self.mode == 1:
+                    random_x = float(np.random.uniform(low=-0.85, high=-0.50, size=1))
+                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
+                elif self.mode == 2:
+                    random_x = float(np.random.uniform(low=-0.15, high=0.15, size=1))
+                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
+                else:
+                    raise ValueError()
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.0])
-            elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.85, 0.0])
+                if self.mode == 0:
+                    random_x = float(np.random.uniform(low=-0.85, high=-0.50, size=1))
+                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                elif self.mode == 1:
+                    random_x = float(np.random.uniform(low=0.50, high=0.85, size=1))
+                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                elif self.mode == 2:
+                    random_x = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                else:
+                    raise ValueError()
             else:
                 raise ValueError()
-
-        # random properties for goals (vis purpose)
-        for i, goal in enumerate(world.goals):
-            goal.color = world.agents[i].color
-            goal.state.p_pos = np.zeros(world.dim_p) - 2  # Initialize outside of the box
-            goal.state.p_vel = np.zeros(world.dim_p)
+            landmark.state.p_pos = np.array([random_x, random_y])
 
     def reward(self, agent, world):
         for i, landmark in enumerate(world.landmarks):
@@ -89,8 +115,6 @@ class Scenario(BaseScenario):
                 box0 = landmark
             elif "target" in landmark.name and landmark.index == 0:
                 target0 = landmark
-            elif "target" in landmark.name and landmark.index == 1:
-                target1 = landmark
             else:
                 raise ValueError()
 
@@ -103,7 +127,7 @@ class Scenario(BaseScenario):
         # get positions of all entities
         entity_pos = []
         for entity in world.landmarks:
-            entity_pos.append(entity.state.p_pos)
+            entity_pos.append(entity.state.p_pos - agent.state.p_pos)
         assert len(entity_pos) == len(self.boxes) + len(self.targets)
 
         # Add other agent position
@@ -111,6 +135,6 @@ class Scenario(BaseScenario):
         for other in world.agents:
             if other is agent: 
                 continue
-            other_pos.append(other.state.p_pos)
+            other_pos.append(other.state.p_pos - agent.state.p_pos)
 
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
