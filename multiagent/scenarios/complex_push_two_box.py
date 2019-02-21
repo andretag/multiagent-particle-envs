@@ -11,7 +11,7 @@ class Scenario(BaseScenario):
         - Mode1: Pretrain to push box to the right
         - Mode2: Test to push box0 and box1 to the left and right, respectively
     """
-    def make_world(self, mode):
+    def make_world(self, mode=0):
         world = World()
 
         self.mode = mode
