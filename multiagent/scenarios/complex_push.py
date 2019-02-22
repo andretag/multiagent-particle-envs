@@ -4,7 +4,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, mode):
+    def make_world(self, mode=0):
         """
         mode0:
         - Random agent loc
@@ -33,7 +33,8 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = True
             agent.silent = True
-            agent.size = 0.05
+            agent.size = 0.10
+            agent.i = i
 
         # add boxes
         n_box = 1  # One box and pushing to left
@@ -42,8 +43,8 @@ class Scenario(BaseScenario):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
-            box.size = 0.125
-            box.initial_mass = 7.
+            box.size = 0.25
+            box.initial_mass = 5.
             box.index = i
             world.landmarks.append(box)
 
@@ -59,6 +60,8 @@ class Scenario(BaseScenario):
 
         # make initial conditions
         self.reset_world(world)
+
+        self.timestep = 0.
         
         return world
 
@@ -83,8 +86,8 @@ class Scenario(BaseScenario):
 
             if "box" in landmark.name and landmark.index == 0:
                 if self.mode == 0:
-                    random_x = float(np.random.uniform(low=0.50, high=0.85, size=1))
-                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
+                    random_x = float(np.random.uniform(low=-0.0, high=0.0, size=1))
+                    random_y = float(np.random.uniform(low=-0.0, high=0.0, size=1))
                 elif self.mode == 1:
                     random_x = float(np.random.uniform(low=-0.85, high=-0.50, size=1))
                     random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
@@ -95,8 +98,8 @@ class Scenario(BaseScenario):
                     raise ValueError()
             elif "target" in landmark.name and landmark.index == 0:
                 if self.mode == 0:
-                    random_x = float(np.random.uniform(low=-0.85, high=-0.50, size=1))
-                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                    random_x = -0.85
+                    random_y = 0.
                 elif self.mode == 1:
                     random_x = float(np.random.uniform(low=0.50, high=0.85, size=1))
                     random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
@@ -108,6 +111,8 @@ class Scenario(BaseScenario):
             else:
                 raise ValueError()
             landmark.state.p_pos = np.array([random_x, random_y])
+
+        self.timestep = 0.
 
     def reward(self, agent, world):
         for i, landmark in enumerate(world.landmarks):
@@ -124,6 +129,9 @@ class Scenario(BaseScenario):
         return -dist
 
     def observation(self, agent, world):
+        if agent.i == 0:
+            self.timestep += 1
+
         # get positions of all entities
         entity_pos = []
         for entity in world.landmarks:
@@ -137,4 +145,5 @@ class Scenario(BaseScenario):
                 continue
             other_pos.append(other.state.p_pos - agent.state.p_pos)
 
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
+        # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + [np.array([self.timestep / 100.])])
