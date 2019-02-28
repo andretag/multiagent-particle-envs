@@ -4,7 +4,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, mode=0):
+    def make_world(self):
         """
         mode0:
         - Random agent loc
@@ -21,10 +21,6 @@ class Scenario(BaseScenario):
         - Box at center
         - Target at random
         """
-        assert mode >= 0
-        assert mode <= 2
-        self.mode = mode
-
         world = World()
 
         # add agents
@@ -66,30 +62,24 @@ class Scenario(BaseScenario):
         
         return world
 
-    def reset_world(self, world):
+    def reset_world(self, world, flip=False):
         # random properties for agents
-        option = np.random.randint(low=0, high=1)
         for i, agent in enumerate(world.agents):
             if i == 0:
                 agent.color = np.array([1.0, 0.0, 0.0])
-                if option == 0:
-                    agent.state.p_pos = np.array([0.40, 0.40])
-                elif option == 1:
-                    agent.state.p_pos = np.array([0.40, -0.40])
+                if flip is False:
+                    agent.state.p_pos = np.array([0.30, 0.30])
                 else:
-                    raise ValueError()
+                    agent.state.p_pos = np.array([0.30, -0.30])
             elif i == 1:
                 agent.color = np.array([0.0, 1.0, 0.0])
-                if option == 0:
-                    agent.state.p_pos = np.array([0.40, -0.40])
-                elif option == 1:
-                    agent.state.p_pos = np.array([0.40, 0.40])
+                if flip is False:
+                    agent.state.p_pos = np.array([0.30, -0.30])
                 else:
-                    raise ValueError()
+                    agent.state.p_pos = np.array([0.30, 0.30])
             else:
                 raise NotImplementedError()
 
-            # agent.state.p_pos = np.random.uniform(-0.4, +0.4, world.dim_p)
             assert self.check_overlap(agent.state.p_pos, i, world) is True
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
@@ -100,30 +90,11 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                if self.mode == 0:
-                    random_x, random_y = 0., 0.
-                elif self.mode == 1:
-                    random_x = float(np.random.uniform(low=-0.85, high=-0.50, size=1))
-                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
-                elif self.mode == 2:
-                    random_x = float(np.random.uniform(low=-0.15, high=0.15, size=1))
-                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
-                else:
-                    raise ValueError()
+                landmark.state.p_pos = np.array([0., 0.])
             elif "target" in landmark.name and landmark.index == 0:
-                if self.mode == 0:
-                    random_x, random_y = -0.85, 0.
-                elif self.mode == 1:
-                    random_x = float(np.random.uniform(low=0.50, high=0.85, size=1))
-                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
-                elif self.mode == 2:
-                    random_x = float(np.random.uniform(low=-0.85, high=0.85, size=1))
-                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
-                else:
-                    raise ValueError()
+                landmark.state.p_pos = np.array([-0.85, 0.])
             else:
                 raise ValueError()
-            landmark.state.p_pos = np.array([random_x, random_y])
 
         self.timestep = 0.
 
@@ -133,7 +104,7 @@ class Scenario(BaseScenario):
         box2agent_radius = box_radius + agent_radius
         agent2agent_radius = agent_radius + agent_radius
 
-        if abs(p_pos[0]) < box2agent_radius and abs(p_pos[1]) < box2agent_radius:
+        if np.sqrt(abs(p_pos[0])**2 + abs(p_pos[1])**2) < box2agent_radius:
             return False
         else:
             if i_agent == 1:
@@ -157,7 +128,7 @@ class Scenario(BaseScenario):
                 raise ValueError()
 
         # Move box0 to target0 (One Box)
-        dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos)) * 50.
+        dist = np.sum(np.square(box0.state.p_pos - target0.state.p_pos))
 
         return -dist
 
@@ -178,5 +149,5 @@ class Scenario(BaseScenario):
                 continue
             other_pos.append(other.state.p_pos - agent.state.p_pos)
 
-        # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + [np.array([self.timestep / 100.])])
+        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
+        # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + [np.array([self.timestep / 100.])])
