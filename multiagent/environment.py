@@ -15,7 +15,7 @@ class MultiAgentEnv(gym.Env):
 
     def __init__(self, world, reset_callback=None, reward_callback=None,
                  observation_callback=None, info_callback=None,
-                 done_callback=None, shared_viewer=True):
+                 done_callback=None, shared_viewer=True, discrete_action=True, post_step_callback=None):
         self.world = world
         self.agents = self.world.policy_agents
         # set required vectorized gym env property

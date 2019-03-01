@@ -4,7 +4,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, mode=0):
+    def make_world(self, mode=2):
         """
         mode0:
         - Random agent loc
@@ -85,32 +85,21 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                if self.mode == 0:
-                    random_x = float(np.random.uniform(low=-0.0, high=0.0, size=1))
-                    random_y = float(np.random.uniform(low=-0.0, high=0.0, size=1))
-                elif self.mode == 1:
-                    random_x = float(np.random.uniform(low=-0.85, high=-0.50, size=1))
-                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
-                elif self.mode == 2:
-                    random_x = float(np.random.uniform(low=-0.15, high=0.15, size=1))
-                    random_y = float(np.random.uniform(low=-0.15, high=0.15, size=1))
-                else:
-                    raise ValueError()
+                landmark.state.p_pos = np.array([0., 0.])
             elif "target" in landmark.name and landmark.index == 0:
                 if self.mode == 0:
-                    random_x = -0.85
-                    random_y = 0.
+                    landmark.state.p_pos = np.array([-0.85, 0.])
                 elif self.mode == 1:
-                    random_x = float(np.random.uniform(low=0.50, high=0.85, size=1))
-                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                    landmark.state.p_pos = np.array([0.85, 0.])
                 elif self.mode == 2:
-                    random_x = float(np.random.uniform(low=-0.85, high=0.85, size=1))
-                    random_y = float(np.random.uniform(low=-0.85, high=0.85, size=1))
+                    if np.random.uniform(low=0.0, high=1.0) > 0.5:
+                        landmark.state.p_pos = np.array([-0.85, 0.])
+                    else:
+                        landmark.state.p_pos = np.array([0.85, 0.])
                 else:
                     raise ValueError()
             else:
                 raise ValueError()
-            landmark.state.p_pos = np.array([random_x, random_y])
 
         self.timestep = 0.
 
@@ -147,3 +136,6 @@ class Scenario(BaseScenario):
 
         # return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + [np.array([self.timestep / 100.])])
+
+    def post_step_callback(self):
+        pass
