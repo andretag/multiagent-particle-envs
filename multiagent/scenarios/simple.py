@@ -37,18 +37,19 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.75, 0.75, 0.75])
         world.landmarks[0].color = np.array([0.75, 0.25, 0.25])
+
         # set random initial states
         for agent in world.agents:
-            agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+            # agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+            agent.state.p_pos = np.array([-0.85, -0.85])
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
+
         for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-            # dk: Check the distance between agent and landmark are initialized
-            # at least x distance
-            while self.check_distance(world.agents, landmark.state.p_pos):
-                landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+            # landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
+            landmark.state.p_pos = np.array([0.85, 0.85])
             landmark.state.p_vel = np.zeros(world.dim_p)
+
         for i, goal in enumerate(world.goals):
             goal.state.p_pos = np.zeros(world.dim_p) - 2  # NOTE Initialize outside of the box
             goal.state.p_vel = np.zeros(world.dim_p)
