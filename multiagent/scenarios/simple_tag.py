@@ -23,7 +23,6 @@ class Scenario(BaseScenario):
             agent.adversary = True if i < num_adversaries else False
             agent.size = 0.075 if agent.adversary else 0.05
             agent.accel = 3.0 if agent.adversary else 4.0
-            # agent.accel = 20.0 if agent.adversary else 25.0
             agent.max_speed = 1.0 if agent.adversary else 1.3
 
         # add landmarks
@@ -34,6 +33,7 @@ class Scenario(BaseScenario):
             landmark.movable = False
             landmark.size = 0.2
             landmark.boundary = False
+
         # make initial conditions
         self.reset_world(world)
         return world
@@ -46,7 +46,7 @@ class Scenario(BaseScenario):
             else:
                 agent.color = np.array([0.35, 0.85, 0.35])  # Prey is green
 
-            # random properties for landmarks
+        # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
 
@@ -58,7 +58,12 @@ class Scenario(BaseScenario):
 
         for i, landmark in enumerate(world.landmarks):
             if not landmark.boundary:
-                landmark.state.p_pos = np.random.uniform(-0.9, +0.9, world.dim_p)
+                if i == 0:
+                    landmark.state.p_pos = np.array([0.5, 0.5])
+                elif i == 1:
+                    landmark.state.p_pos = np.array([0., -0.6])
+                else:
+                    raise NotImplementedError("Only two landmarks supported")
                 landmark.state.p_vel = np.zeros(world.dim_p)
 
     def benchmark_data(self, agent, world):
