@@ -23,7 +23,7 @@ class Scenario(BaseScenario):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
-            box.size = 0.25
+            box.size = 0.20
             box.initial_mass = 7.
             box.index = i
             world.landmarks.append(box)
@@ -83,7 +83,7 @@ class Scenario(BaseScenario):
                 self.box_initial_p_pos = np.array([-0.40, 0.0]) 
                 landmark.state.p_pos = self.box_initial_p_pos
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.0])
+                landmark.state.p_pos = np.array([-0.90, 0.0])
             else:
                 raise ValueError("Only one box and one target are supported")
             landmark.color = np.array([0.25, 0.25, 0.25])
@@ -107,15 +107,10 @@ class Scenario(BaseScenario):
             else:
                 raise ValueError("Only one box and one target are supported")
 
-        dist_target2initialBox = np.sum(np.square(self.box_initial_p_pos - target.state.p_pos))
-        print("dist_target2initialBox", dist_target2initialBox)
-        dist_target2currentBox = np.sum(np.square(box.state.p_pos - target.state.p_pos))
-        print("dist_target2currentBox", dist_target2currentBox)
+        dist_target2initialBox = np.linalg.norm(self.box_initial_p_pos - target.state.p_pos)
+        dist_target2currentBox = np.linalg.norm(box.state.p_pos - target.state.p_pos)
 
         reward = max(dist_target2initialBox - dist_target2currentBox, 0)
-        print("reward:", reward)
-        import sys
-        sys.exit()
 
         return reward
 
