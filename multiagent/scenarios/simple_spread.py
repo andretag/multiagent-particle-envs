@@ -49,7 +49,7 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
         # Check target distances
-        while self.check_target_dist(world, th=agent.size * 5) is False:
+        while self.check_target_dist(world, th=agent.size * 8) is False:
             for i, landmark in enumerate(world.landmarks):
                 landmark.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
 
