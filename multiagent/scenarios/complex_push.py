@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from multiagent.core import World, Agent, Landmark, Goal
 from multiagent.scenario import BaseScenario
@@ -81,7 +82,7 @@ class Scenario(BaseScenario):
         for i, landmark in enumerate(world.landmarks):
             if "box" in landmark.name and landmark.index == 0:
                 self.box_initial_p_pos = np.array([-0.40, 0.0]) 
-                landmark.state.p_pos = self.box_initial_p_pos
+                landmark.state.p_pos = copy.deepcopy(self.box_initial_p_pos)
             elif "target" in landmark.name and landmark.index == 0:
                 landmark.state.p_pos = np.array([-0.90, 0.0])
             else:
