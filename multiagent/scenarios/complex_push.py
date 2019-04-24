@@ -1,4 +1,3 @@
-import copy
 import numpy as np
 from multiagent.core import World, Agent, Landmark, Goal
 from multiagent.scenario import BaseScenario
@@ -50,41 +49,25 @@ class Scenario(BaseScenario):
 
     def reset_world(self, world):
         """Define random properties for agents, box, and target.
-        Depends on mode0 or mode1, initial location of agents change:
-        mode0: agent0 up/agent1 down
-        mode1: agent1 up/agent0 down
+        Two agents are randomly initialized.
         The box and target are initialized at the same location on the left side
         """
-        mode = np.random.randint(low=0, high=2, size=1)[0]
-
         for i, agent in enumerate(world.agents):
             if i == 0:
                 agent.color = np.array([1.0, 0.0, 0.0])  # Red
-                if mode == 0:
-                    agent.state.p_pos = np.array([0., 0.85])
-                elif mode == 1:
-                    agent.state.p_pos = np.array([0., -0.85])
-                else:
-                    raise ValueError("Invalid mode")
             elif i == 1:
                 agent.color = np.array([0.0, 1.0, 0.0])  # Blue
-                if mode == 0:
-                    agent.state.p_pos = np.array([0., -0.85])
-                elif mode == 1:
-                    agent.state.p_pos = np.array([0., 0.85])
-                else:
-                    raise ValueError("Invalid mode")
             else:
                 raise ValueError("Only two agents are supported")
+            agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
         for i, landmark in enumerate(world.landmarks):
             if "box" in landmark.name and landmark.index == 0:
-                self.box_initial_p_pos = np.array([-0.40, 0.0]) 
-                landmark.state.p_pos = copy.deepcopy(self.box_initial_p_pos)
+                landmark.state.p_pos = np.array([-0.40, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.90, 0.0])
+                landmark.state.p_pos = np.array([-0.85, 0.0])
             else:
                 raise ValueError("Only one box and one target are supported")
             landmark.color = np.array([0.25, 0.25, 0.25])
@@ -96,10 +79,7 @@ class Scenario(BaseScenario):
             goal.state.p_vel = np.zeros(world.dim_p)
 
     def reward(self, agent, world):
-        """Reward is defined to be large if distance between box and target is minimized.
-        Note that the reward is scaled to be always in a positive number
-        rew = max(dist(target, box_initial_pos) - dist(target, box_current_pos), 0)
-        """
+        """Reward is defined to be large if distance between box and target is minimized"""
         for i, landmark in enumerate(world.landmarks):
             if "box" in landmark.name and landmark.index == 0:
                 box = landmark
@@ -108,12 +88,7 @@ class Scenario(BaseScenario):
             else:
                 raise ValueError("Only one box and one target are supported")
 
-        dist_target2initialBox = np.linalg.norm(self.box_initial_p_pos - target.state.p_pos)
-        dist_target2currentBox = np.linalg.norm(box.state.p_pos - target.state.p_pos)
-
-        reward = max(dist_target2initialBox - dist_target2currentBox, 0)
-
-        return reward
+        return -np.sum(np.square(box.state.p_pos - target.state.p_pos))
 
     def observation(self, agent, world):
         """For each agent, observation consists of:
