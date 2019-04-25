@@ -1,4 +1,3 @@
-import copy
 import numpy as np
 from multiagent.core import World, Agent, Landmark, Goal
 from multiagent.scenario import BaseScenario
@@ -24,7 +23,7 @@ class Scenario(BaseScenario):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
-            box.size = 0.20
+            box.size = 0.25
             box.initial_mass = 7.
             box.index = i
             world.landmarks.append(box)
@@ -66,18 +65,13 @@ class Scenario(BaseScenario):
 
         for i, landmark in enumerate(world.landmarks):
             if "box" in landmark.name and landmark.index == 0:
-                box = landmark
                 landmark.state.p_pos = np.array([-0.40, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
-                target = landmark
                 landmark.state.p_pos = np.array([-0.85, 0.0])
             else:
                 raise ValueError("Only one box and one target are supported")
             landmark.color = np.array([0.25, 0.25, 0.25])
             landmark.state.p_vel = np.zeros(world.dim_p)
-
-        self.base_reward = -np.linalg.norm(
-            copy.deepcopy(box.state.p_pos) - copy.deepcopy(target.state.p_pos))
 
         for i, goal in enumerate(world.goals):
             goal.color = world.agents[i].color
@@ -94,7 +88,7 @@ class Scenario(BaseScenario):
             else:
                 raise ValueError("Only one box and one target are supported")
 
-        return max(-np.linalg.norm(box.state.p_pos - target.state.p_pos), self.base_reward)
+        return -np.linalg.norm(box.state.p_pos - target.state.p_pos)
 
     def observation(self, agent, world):
         """For each agent, observation consists of:
