@@ -52,14 +52,28 @@ class Scenario(BaseScenario):
         Two agents are randomly initialized.
         The box and target are initialized at the same location on the left side
         """
+        mode = np.random.randint(low=0, high=2, size=1)[0]
+
         for i, agent in enumerate(world.agents):
             if i == 0:
                 agent.color = np.array([1.0, 0.0, 0.0])  # Red
+                if mode == 0:
+                    agent.state.p_pos = np.array([0., 0.4])
+                elif mode == 1:
+                    agent.state.p_pos = np.array([0., -0.4])
+                else:
+                    raise ValueError("Invalid mode")
             elif i == 1:
                 agent.color = np.array([0.0, 1.0, 0.0])  # Blue
+                if mode == 0:
+                    agent.state.p_pos = np.array([0., -0.4])
+                elif mode == 1:
+                    agent.state.p_pos = np.array([0., 0.4])
+                else:
+                    raise ValueError("Invalid mode")
             else:
                 raise ValueError("Only two agents are supported")
-            agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
+            agent.state.p_pos += np.random.uniform(-0.05, +0.05, world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
