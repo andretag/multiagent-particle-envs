@@ -66,6 +66,8 @@ class Scenario(BaseScenario):
                     raise NotImplementedError("Only two landmarks supported")
                 landmark.state.p_vel = np.zeros(world.dim_p)
 
+        self.count = 0
+
     def benchmark_data(self, agent, world):
         # returns data for benchmarking purposes
         if agent.adversary:
@@ -139,6 +141,7 @@ class Scenario(BaseScenario):
         return rew
 
     def observation(self, agent, world):
+        self.count += 1
         # get positions of all entities in this agent's reference frame
         entity_pos = []
         for entity in world.landmarks:
@@ -157,3 +160,9 @@ class Scenario(BaseScenario):
             if not other.adversary:
                 other_vel.append(other.state.p_vel)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel)
+
+    def done_callback(self, agent, world):
+        if self.count >= 100:
+            return True
+        else:
+            return False
