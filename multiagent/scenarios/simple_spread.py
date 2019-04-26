@@ -1,5 +1,5 @@
 import numpy as np
-from multiagent.core import World, Agent, Landmark
+from multiagent.core import World, Agent, Landmark, Goal
 from multiagent.scenario import BaseScenario
 
 
@@ -22,6 +22,12 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
+
+        world.goals = [Goal() for i in range(len(world.agents))]
+        for i, goal in enumerate(world.goals):
+            goal.name = 'goal %d' % i
+            goal.collide = False
+            goal.movable = False
 
         self.reset_world(world)
 
@@ -52,6 +58,11 @@ class Scenario(BaseScenario):
         while self.check_target_dist(world, th=agent.size * 8) is False:
             for i, landmark in enumerate(world.landmarks):
                 landmark.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
+
+        for i, goal in enumerate(world.goals):
+            goal.color = world.agents[i].color
+            goal.state.p_pos = np.zeros(world.dim_p) - 2  # Initialize outside of domain
+            goal.state.p_vel = np.zeros(world.dim_p)
 
     def check_target_dist(self, world, th):
         for i, landmark_i in enumerate(world.landmarks):
