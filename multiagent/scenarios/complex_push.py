@@ -23,7 +23,7 @@ class Scenario(BaseScenario):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
-            box.size = 0.25
+            box.size = 0.20
             box.initial_mass = 7.
             box.index = i
             world.landmarks.append(box)
@@ -58,17 +58,17 @@ class Scenario(BaseScenario):
             if i == 0:
                 agent.color = np.array([1.0, 0.0, 0.0])  # Red
                 if mode == 0:
-                    agent.state.p_pos = np.array([0., 0.4])
+                    agent.state.p_pos = np.array([0., 0.85])
                 elif mode == 1:
-                    agent.state.p_pos = np.array([0., -0.4])
+                    agent.state.p_pos = np.array([0., -0.85])
                 else:
                     raise ValueError("Invalid mode")
             elif i == 1:
                 agent.color = np.array([0.0, 1.0, 0.0])  # Blue
                 if mode == 0:
-                    agent.state.p_pos = np.array([0., -0.4])
+                    agent.state.p_pos = np.array([0., -0.85])
                 elif mode == 1:
-                    agent.state.p_pos = np.array([0., 0.4])
+                    agent.state.p_pos = np.array([0., 0.85])
                 else:
                     raise ValueError("Invalid mode")
             else:
