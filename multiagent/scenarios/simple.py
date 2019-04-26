@@ -58,10 +58,10 @@ class Scenario(BaseScenario):
 
     def observation(self, agent, world):
         """For each agent, observation consists of:
-        [agent velocity, agent pos, target pos]
+        [agent pos, target pos]
         """
         entity_pos = []
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos)
 
-        return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos)
+        return np.concatenate([agent.state.p_pos] + entity_pos)
