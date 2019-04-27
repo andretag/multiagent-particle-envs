@@ -108,6 +108,9 @@ class MultiAgentEnv(gym.Env):
             if self.n == 2:
                 assert reward_n[0] == reward_n[1]
 
+        if np.sum(done_n) > 0:
+            done_n = [True for _ in range(len(self.agents))]
+
         return obs_n, reward_n, done_n, info_n
 
     def reset(self):

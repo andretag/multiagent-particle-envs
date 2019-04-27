@@ -66,6 +66,9 @@ class Scenario(BaseScenario):
                     raise NotImplementedError("Only two landmarks supported")
                 landmark.state.p_vel = np.zeros(world.dim_p)
 
+        world.agents[0].state.p_pos = np.array([-0.5, 0.])
+        world.agents[1].state.p_pos = np.array([0.5, 0.])
+
         self.count = 0
 
     def benchmark_data(self, agent, world):
