@@ -69,11 +69,11 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.5, 0.0])
+                landmark.state.p_pos = np.array([-0.25, 0.0])
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.95, 0.0])
+                landmark.state.p_pos = np.array([-0.85, 0.0])
             elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.95, 0.0])
+                landmark.state.p_pos = np.array([+0.85, 0.0])
             else:
                 raise ValueError()
 
