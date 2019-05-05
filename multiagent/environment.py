@@ -110,9 +110,12 @@ class MultiAgentEnv(gym.Env):
 
         return obs_n, reward_n, done_n, info_n
 
-    def reset(self):
+    def reset(self, mode=None):
         # reset world
-        self.reset_callback(self.world)
+        if mode is None:
+            self.reset_callback(self.world)
+        else:
+            self.reset_callback(self.world, mode=mode)
         # reset renderer
         self._reset_render()
         # record observations for each agent
