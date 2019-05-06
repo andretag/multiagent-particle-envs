@@ -27,18 +27,18 @@ class Scenario(BaseScenario):
     def reset_world(self, world, mode):
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.25, 0.25, 0.25])
-            agent.state.p_pos = np.array([-0.85, -0.85])
+            noise = np.random.uniform(-0.05, +0.05, world.dim_p)
+            agent.state.p_pos = np.array([-0.5, -0.5]) + noise
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.75, 0.75, 0.75])
             if mode == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.85])
+                landmark.state.p_pos = np.array([-0.5, 0.5])
             elif mode == 1:
-                landmark.state.p_pos = np.array([0.85, -0.85])
+                landmark.state.p_pos = np.array([0.5, -0.5])
             else:
-                print(mode)
                 raise ValueError("Invalid mode")
             landmark.state.p_vel = np.zeros(world.dim_p)
 
@@ -52,9 +52,9 @@ class Scenario(BaseScenario):
     def observation(self, agent, world):
         if self.goal_reached is False:
             dist = np.linalg.norm(agent.state.p_pos - world.landmarks[0].state.p_pos)
-            if dist < 0.05:
+            if dist < 0.15:
                 self.goal_reached = True
-                world.landmarks[0].state.p_pos = np.array([0.85, 0.85])
+                world.landmarks[0].state.p_pos = np.array([0.5, 0.5])
 
         entity_pos = []
         for entity in world.landmarks:
