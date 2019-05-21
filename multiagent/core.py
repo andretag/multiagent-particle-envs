@@ -203,6 +203,7 @@ class World(object):
         return all_contact
 
     # integrate physical state
+    # NOTE For the box, it can be moved if and only if all agents are contacting the box
     def integrate_state(self, p_force):
         for i, entity in enumerate(self.entities):
             if not entity.movable:

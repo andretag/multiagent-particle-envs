@@ -41,6 +41,7 @@ class MultiAgentEnv(gym.Env):
         self.observation_space = []
         for agent in self.agents:
             total_action_space = []
+
             # physical action space
             if self.discrete_action_space:
                 u_action_space = spaces.Discrete(world.dim_p * 2 + 1)
@@ -48,6 +49,7 @@ class MultiAgentEnv(gym.Env):
                 u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,), dtype=np.float32)
             if agent.movable:
                 total_action_space.append(u_action_space)
+
             # communication action space
             if self.discrete_action_space:
                 c_action_space = spaces.Discrete(world.dim_c)
@@ -55,6 +57,7 @@ class MultiAgentEnv(gym.Env):
                 c_action_space = spaces.Box(low=0.0, high=1.0, shape=(world.dim_c,), dtype=np.float32)
             if not agent.silent:
                 total_action_space.append(c_action_space)
+
             # total action space
             if len(total_action_space) > 1:
                 # all action spaces are discrete, so simplify to MultiDiscrete action space
@@ -65,6 +68,7 @@ class MultiAgentEnv(gym.Env):
                 self.action_space.append(act_space)
             else:
                 self.action_space.append(total_action_space[0])
+
             # observation space
             obs_dim = len(observation_callback(agent, self.world))
             self.observation_space.append(spaces.Box(low=-np.inf, high=+np.inf, shape=(obs_dim,), dtype=np.float32))
@@ -88,11 +92,14 @@ class MultiAgentEnv(gym.Env):
         done_n = []
         info_n = {'n': []}
         self.agents = self.world.policy_agents
+
         # set action for each agent
         for i, agent in enumerate(self.agents):
             self._set_action(action_n[i], agent, self.action_space[i])
+
         # advance world state
         self.world.step()
+
         # record observation for each agent
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
@@ -111,17 +118,18 @@ class MultiAgentEnv(gym.Env):
         return obs_n, reward_n, done_n, info_n
 
     def reset(self):
-        # reset world
+        # Reset world
         self.reset_callback(self.world)
-        # reset renderer
+
+        # Reset renderer
         self._reset_render()
+
         # record observations for each agent
         obs_n = []
         self.agents = self.world.policy_agents
         for agent in self.agents:
             obs_n.append(self._get_obs(agent))
         return obs_n
-        # return obs_n[0]  # NOTE dkk Required for single agent rl
 
     # get info used for benchmarking
     def _get_info(self, agent):

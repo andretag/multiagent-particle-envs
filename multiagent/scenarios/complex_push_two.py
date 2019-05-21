@@ -4,11 +4,16 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, mode):
+    def make_world(self, mode=2):
+        """Define two agents, two boxes, and two targets.
+        Note that world.goals are used only for hierarchical RL visualization only
+        Mode0: Pre-train agents to move left box
+        Mode1: Pre-train agents to move right box
+        Mode2: Train agents to move both left and right box
+        """
         world = World()
         self.mode = mode
 
-        # add agents
         world.agents = [Agent() for i in range(2)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
@@ -16,7 +21,6 @@ class Scenario(BaseScenario):
             agent.silent = True
             agent.size = 0.1
 
-        # add boxes
         self.boxes = [Landmark() for _ in range(2)]
         for i, box in enumerate(self.boxes):
             box.name = 'box %d' % i
@@ -24,7 +28,7 @@ class Scenario(BaseScenario):
             box.collide = True
             box.index = i
 
-            # Box movable for pretrain
+            # Box modes for pre-training only
             if self.mode == 0 and box.index == 1:
                 box.movable = False
             elif self.mode == 1 and box.index == 0:
@@ -32,7 +36,7 @@ class Scenario(BaseScenario):
             else:
                 box.movable = True
 
-            # Different box mass
+            # Different box mass (Box1 is 3x heavier than Box0)
             if box.index == 0:
                 box.initial_mass = 2.
             elif box.index == 1:
@@ -41,7 +45,6 @@ class Scenario(BaseScenario):
                 raise ValueError()
             world.landmarks.append(box)
 
-        # add targets
         self.targets = [Landmark() for _ in range(2)]
         for i, target in enumerate(self.targets):
             target.name = 'target %d' % i
@@ -51,25 +54,27 @@ class Scenario(BaseScenario):
             target.index = i
             world.landmarks.append(target)
 
-        # add goals (used only for vis)
         world.goals = [Goal() for i in range(len(world.agents))]
         for i, goal in enumerate(world.goals):
             goal.name = 'goal %d' % i
             goal.collide = False
             goal.movable = False
 
-        # make initial conditions
         self.reset_world(world)
         
         return world
 
     def reset_world(self, world):
-        # random properties for agents
+        """Define random properties for agents, boxes, and targets.
+        Two agents are randomly initialized.
+        One box and target are initialized on the left side.
+        The other box and target are initialized on the right side.
+        """
         for i, agent in enumerate(world.agents):
             if i == 0:
-                agent.color = np.array([1.0, 0.0, 0.0])
+                agent.color = np.array([1.0, 0.0, 0.0])  # Red
             elif i == 1:
-                agent.color = np.array([0.0, 1.0, 0.0])
+                agent.color = np.array([0.0, 1.0, 0.0])  # Blue
             else:
                 raise NotImplementedError()
 
@@ -77,23 +82,21 @@ class Scenario(BaseScenario):
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
-        # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.30, 0.0])
+                landmark.state.p_pos = np.array([-0.30, 0.0])  # Left box
             elif "box" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([0.30, 0.0])
+                landmark.state.p_pos = np.array([+0.30, 0.0])  # Right box
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.0])
+                landmark.state.p_pos = np.array([-0.85, 0.0])  # Left target
             elif "target" in landmark.name and landmark.index == 1:
-                landmark.state.p_pos = np.array([+0.85, 0.0])
+                landmark.state.p_pos = np.array([+0.85, 0.0])  # Right target
             else:
                 raise ValueError()
 
-        # random properties for goals (vis purpose)
         for i, goal in enumerate(world.goals):
             goal.color = world.agents[i].color
             goal.state.p_pos = np.zeros(world.dim_p) - 2  # Initialize outside of the box
@@ -119,13 +122,14 @@ class Scenario(BaseScenario):
         return -dist
 
     def observation(self, agent, world):
-        # get positions of all entities
+        """For each agent, observation consists of:
+        [agent velocity, agent pos, box poses, targets poses, other agent pos]
+        """
         entity_pos = []
         for entity in world.landmarks:
             entity_pos.append(entity.state.p_pos)
         assert len(entity_pos) == len(self.boxes) + len(self.targets)
 
-        # Add other agent position
         other_pos = []
         for other in world.agents:
             if other is agent: 
