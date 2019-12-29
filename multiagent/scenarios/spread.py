@@ -25,15 +25,16 @@ class Scenario(BaseScenario):
             landmark.collide = False
             landmark.movable = False 
 
-        self.reset_world(world)
+        # Create dummy task
+        task = [np.array([0., 0.]) for _ in range(args.n_agent)]
+        self.reset_world(world, task)
         return world
 
-    def reset_world(self, world):
-        # TODO Same initial pos
-        for i, agent in enumerate(world.agents):
-            if i == 0:
+    def reset_world(self, world, task):
+        for i_agent, agent in enumerate(world.agents):
+            if i_agent == 0:
                 agent.color = np.array([1.0, 0.0, 0.0])
-            elif i == 1:
+            elif i_agent == 1:
                 agent.color = np.array([0.0, 1.0, 0.0])
             else:
                 raise NotImplementedError()
@@ -41,62 +42,18 @@ class Scenario(BaseScenario):
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
-        for i, landmark in enumerate(world.landmarks):
+        for i_landmark, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
-            landmark.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
+            landmark.state.p_pos = task[i_landmark]
             landmark.state.p_vel = np.zeros(world.dim_p)
-        while self.check_landmark_dist(world, th=agent.size * 2.) is False:
-            for i, landmark in enumerate(world.landmarks):
-                landmark.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
-                landmark.state.p_vel = np.zeros(world.dim_p)
-
-    def check_landmark_dist(self, world, th):
-        for i, landmark_i in enumerate(world.landmarks):
-            pos_i = landmark_i.state.p_pos
-            for j, landmark_j in enumerate(world.landmarks):
-                if i != j:
-                    pos_j = landmark_j.state.p_pos
-                    dist = np.sqrt(np.sum(np.square(pos_i - pos_j)))
-                    if dist <= th:
-                        return False
-        return True
-
-    def benchmark_data(self, agent, world):
-        rew = 0
-        collisions = 0
-        occupied_landmarks = 0
-        min_dists = 0
-        for l in world.landmarks:
-            dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
-            min_dists += min(dists)
-            rew -= min(dists)
-            if min(dists) < 0.1:
-                occupied_landmarks += 1
-        if agent.collide:
-            for a in world.agents:
-                if self.is_collision(a, agent):
-                    rew -= 1
-                    collisions += 1
-        return (rew, collisions, min_dists, occupied_landmarks)
-
-    def is_collision(self, agent1, agent2):
-        delta_pos = agent1.state.p_pos - agent2.state.p_pos
-        dist = np.sqrt(np.sum(np.square(delta_pos)))
-        dist_min = agent1.size + agent2.size
-        return True if dist < dist_min else False
 
     def reward(self, agent, world):
-        # Agents are rewarded based on minimum agent distance to each landmark, penalized for collisions
-        rew = 0
+        reward = 0
         for l in world.landmarks:
             dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
-            rew -= min(dists)
-        if agent.collide:
-            raise ValueError("remove")
-            for a in world.agents:
-                if self.is_collision(a, agent):
-                    rew -= 1
-        return rew
+            reward -= min(dists)
+
+        return reward
 
     def observation(self, agent, world):
         agent_poses = []

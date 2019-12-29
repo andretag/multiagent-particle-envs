@@ -111,20 +111,17 @@ class MultiAgentEnv(gym.Env):
         if self.n == 2:
             assert reward_n[0] == reward_n[1]
 
-        return obs_n, reward_n, done_n, info_n
+        return obs_n[0], reward_n[0], done_n, info_n
 
-    def reset(self):
-        # reset world
-        self.reset_callback(self.world)
-        # reset renderer
+    def reset(self, task):
+        self.reset_callback(self.world, task)
         self._reset_render()
-        # record observations for each agent
-        obs_n = []
+
+        # For meta branch, we are interested in state
+        # instead of observation. Thus, all agents receive
+        # same observation
         self.agents = self.world.policy_agents
-        for agent in self.agents:
-            obs_n.append(self._get_obs(agent))
-        return obs_n
-        # return obs_n[0]  # NOTE dkk Required for single agent rl
+        return self._get_obs(self.agents[0])
 
     # get info used for benchmarking
     def _get_info(self, agent):
