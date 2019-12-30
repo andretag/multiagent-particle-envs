@@ -83,6 +83,10 @@ class MultiAgentEnv(gym.Env):
         np.random.seed(seed)
 
     def step(self, action_n):
+        # NaN check
+        for action in action_n:
+            assert sum(np.isnan(action)) == 0 
+
         action_n = [
             np.clip(action, self.action_space[0].low[0], self.action_space[0].high[0]) 
             for action in action_n]
