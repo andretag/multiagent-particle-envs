@@ -1,7 +1,6 @@
 import gym
 import random
 import gym.spaces as spaces
-from gym.envs.registration import EnvSpec
 import numpy as np
 from multiagent.multi_discrete import MultiDiscrete
 
@@ -10,7 +9,7 @@ from multiagent.multi_discrete import MultiDiscrete
 # currently code assumes that no agents will be created/destroyed at runtime!
 class MultiAgentEnv(gym.Env):
     metadata = {
-        'render.modes' : ['human', 'rgb_array']
+        'render.modes': ['human', 'rgb_array']
     }
 
     def __init__(self, world, reset_callback=None, reward_callback=None,
@@ -27,7 +26,7 @@ class MultiAgentEnv(gym.Env):
         self.info_callback = info_callback
         self.done_callback = done_callback
         # environment parameters
-        self.discrete_action_space = False
+        self.discrete_action_space = True
         # if true, action is a number 0...N, otherwise action is a one-hot N-dimensional vector
         self.discrete_action_input = False
         # if true, even the action is continuous, action will be performed discretely
@@ -83,13 +82,10 @@ class MultiAgentEnv(gym.Env):
         np.random.seed(seed)
 
     def step(self, action_n):
-        # NaN check
-        for action in action_n:
-            assert sum(np.isnan(action)) == 0 
-
-        action_n = [
-            np.clip(action, self.action_space[0].low[0], self.action_space[0].high[0]) 
-            for action in action_n]
+        if self.discrete_action_space is False:
+            action_n = [
+                np.clip(action, self.action_space[0].low[0], self.action_space[0].high[0]) 
+                for action in action_n]
         obs_n = []
         reward_n = []
         done_n = []
@@ -162,7 +158,7 @@ class MultiAgentEnv(gym.Env):
             size = action_space.high - action_space.low + 1
             index = 0
             for s in size:
-                act.append(action[index:(index+s)])
+                act.append(action[index: (index + s)])
                 index += s
             action = act
         else:
@@ -173,10 +169,14 @@ class MultiAgentEnv(gym.Env):
             if self.discrete_action_input:
                 agent.action.u = np.zeros(self.world.dim_p)
                 # process discrete action
-                if action[0] == 1: agent.action.u[0] = -1.0
-                if action[0] == 2: agent.action.u[0] = +1.0
-                if action[0] == 3: agent.action.u[1] = -1.0
-                if action[0] == 4: agent.action.u[1] = +1.0
+                if action[0] == 1: 
+                    agent.action.u[0] = -1.0
+                if action[0] == 2: 
+                    agent.action.u[0] = +1.0
+                if action[0] == 3: 
+                    agent.action.u[1] = -1.0
+                if action[0] == 4: 
+                    agent.action.u[1] = +1.0
             else:
                 if self.force_discrete_action:
                     d = np.argmax(action[0])
@@ -214,9 +214,9 @@ class MultiAgentEnv(gym.Env):
             alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             message = ''
             for agent in self.world.agents:
-                comm = []
                 for other in self.world.agents:
-                    if other is agent: continue
+                    if other is agent:
+                        continue
                     if np.all(other.state.c == 0):
                         word = '_'
                     else:
@@ -228,9 +228,9 @@ class MultiAgentEnv(gym.Env):
             # create viewers (if necessary)
             if self.viewers[i] is None:
                 # import rendering only if we need it (and don't import for headless machines)
-                #from gym.envs.classic_control import rendering
+                # from gym.envs.classic_control import rendering
                 from multiagent import rendering
-                self.viewers[i] = rendering.Viewer(700,700)
+                self.viewers[i] = rendering.Viewer(700, 700)
 
         # create rendering geometry
         if self.world.goals is not None:
@@ -240,7 +240,7 @@ class MultiAgentEnv(gym.Env):
 
         if self.render_geoms is None:
             # import rendering only if we need it (and don't import for headless machines)
-            #from gym.envs.classic_control import rendering
+            # from gym.envs.classic_control import rendering
             from multiagent import rendering
             self.render_geoms = []
             self.render_geoms_xform = []
