@@ -38,6 +38,8 @@ class Scenario(BaseScenario):
                 agent.color = np.array([0.0, 1.0, 0.0])
             elif i_agent == 2:
                 agent.color = np.array([0.0, 0.0, 1.0])
+            elif i_agent == 3:
+                agent.color = np.array([0.25, 0.25, 0.25])
             else:
                 raise NotImplementedError()
             agent.state.p_pos = np.array([0., 0.])
@@ -62,13 +64,12 @@ class Scenario(BaseScenario):
         for agent in world.agents:
             agent_poses.append(agent.state.p_pos)
 
-        # agent_vels = []
-        # for agent in world.agents:
-        #     agent_vels.append(agent.state.p_vel)
+        agent_vels = []
+        for agent in world.agents:
+            agent_vels.append(agent.state.p_vel)
 
         entity_poses = []
         for entity in world.landmarks:
             entity_poses.append(entity.state.p_pos)
 
-        # return np.concatenate(agent_poses + agent_vels + entity_poses)
-        return np.concatenate(agent_poses + entity_poses)
+        return np.concatenate(agent_poses + agent_vels + entity_poses)
