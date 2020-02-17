@@ -61,19 +61,6 @@ class Landmark(Entity):
         super(Landmark, self).__init__()
 
 
-# properties of goal entities
-class Goal(Entity):
-    def __init__(self):
-        super(Goal, self).__init__()
-
-
-# properties of Border entities
-class Border(Entity):
-    def __init__(self):
-        super(Border, self).__init__()
-        self.pos = None
-
-
 # properties of agent entities
 class Agent(Entity):
     def __init__(self):
@@ -119,11 +106,8 @@ class World(object):
         # contact response parameters
         self.contact_force = 1e+2
         self.contact_margin = 1e-3
-        # wall boundaries
-        self.x_min = -1
-        self.x_max = +1
-        self.y_min = -1
-        self.y_max = +1
+        # whether or not to clip positions to constraint the agents to the visible screen
+        self.clip_positions = False
 
     # return all entities in the world
     @property
@@ -149,8 +133,6 @@ class World(object):
         p_force = [None] * len(self.entities)
         # apply agent physical controls
         p_force = self.apply_action_force(p_force)
-        # # apply wall forces
-        # p_force = self.apply_wall_force(p_force)
         # apply environment forces
         p_force = self.apply_environment_force(p_force)
         # integrate physical state
@@ -162,25 +144,17 @@ class World(object):
     # gather agent action forces
     def apply_action_force(self, p_force):
         # set applied forces
-        for i,agent in enumerate(self.agents):
+        for i, agent in enumerate(self.agents):
             if agent.movable:
                 noise = np.random.randn(*agent.action.u.shape) * agent.u_noise if agent.u_noise else 0.0
                 p_force[i] = agent.action.u + noise                
         return p_force
 
-    def apply_wall_force(self, p_force):
-        # Adds collisions between agents and bounds (x: [-1,+1], y: [-1,+1])
-        for i,agent in enumerate(self.agents):
-            if agent.collide:
-                f_i = self.get_wall_collision_force(agent)
-                p_force[i] = f_i + p_force[i]
-        return p_force
-
     # gather physical forces acting on entities
     def apply_environment_force(self, p_force):
         # simple (but inefficient) collision response
-        for a,entity_a in enumerate(self.entities):
-            for b,entity_b in enumerate(self.entities):
+        for a, entity_a in enumerate(self.entities):
+            for b, entity_b in enumerate(self.entities):
                 if(b <= a): continue
                 [f_a, f_b] = self.get_collision_force(entity_a, entity_b)
                 if(f_a is not None):
@@ -219,6 +193,9 @@ class World(object):
                                                                   np.square(entity.state.p_vel[1])) * entity.max_speed
             entity.state.p_pos += entity.state.p_vel * self.dt
 
+            if self.clip_positions:
+                entity.state.p_pos = np.clip(entity.state.p_pos, -1., 1.)
+
     def update_agent_state(self, agent):
         # set communication state (directly for now)
         if agent.silent:
@@ -245,32 +222,3 @@ class World(object):
         force_a = +force if entity_a.movable else None
         force_b = -force if entity_b.movable else None
         return [force_a, force_b]
-
-    def get_wall_collision_force(self, agent):
-        if (not agent.collide):
-            return None
-        
-        x_delts = np.array((agent.state.p_pos[0]-self.x_min, agent.state.p_pos[0]-self.x_max))
-        y_delts = np.array((agent.state.p_pos[1]-self.y_min, agent.state.p_pos[1]-self.y_max))
-
-        x_dists = np.abs(x_delts)
-        y_dists = np.abs(y_delts)
-
-        dist_min = agent.size
-
-        k = self.contact_margin
-        x_pen = np.logaddexp(0, -(x_dists - dist_min)/k)*k
-        y_pen = np.logaddexp(0, -(y_dists - dist_min)/k)*k
-
-        force_x = self.contact_force * x_delts / x_dists * x_pen
-        force_y = self.contact_force * y_delts / y_dists * y_pen
-
-        force_x = force_x[np.nonzero(force_x)]
-        force_y = force_y[np.nonzero(force_y)]
-
-        force_x = force_x[0] if force_x.size !=0 else 0
-        force_y = force_y[0] if force_y.size !=0 else 0
-
-        force = [force_x, force_y]
-
-        return force

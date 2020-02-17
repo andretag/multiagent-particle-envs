@@ -9,6 +9,7 @@ class Scenario(BaseScenario):
         world = World()
         world.dim_c = args.n_agent
         world.collaborative = True
+        world.clip_positions = True
 
         # Add agents
         world.agents = [Agent() for i in range(args.n_agent)]
