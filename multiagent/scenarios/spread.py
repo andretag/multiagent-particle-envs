@@ -60,16 +60,13 @@ class Scenario(BaseScenario):
         return reward
 
     def observation(self, agent, world):
-        agent_poses = []
-        for agent in world.agents:
-            agent_poses.append(agent.state.p_pos)
-
-        agent_vels = []
-        for agent in world.agents:
-            agent_vels.append(agent.state.p_vel)
+        # agent_poses = []
+        # for agent in world.agents:
+        #     agent_poses.append(agent.state.p_pos)
 
         entity_poses = []
         for entity in world.landmarks:
             entity_poses.append(entity.state.p_pos)
 
-        return np.concatenate(agent_poses + agent_vels + entity_poses)
+        # return np.concatenate(agent_poses + entity_poses)
+        return np.concatenate([agent.state.p_pos] + entity_poses)
