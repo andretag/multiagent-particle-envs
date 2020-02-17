@@ -26,7 +26,7 @@ class MultiAgentEnv(gym.Env):
         self.info_callback = info_callback
         self.done_callback = done_callback
         # environment parameters
-        self.discrete_action_space = True
+        self.discrete_action_space = False
         # if true, action is a number 0...N, otherwise action is a one-hot N-dimensional vector
         self.discrete_action_input = False
         # if true, even the action is continuous, action will be performed discretely
@@ -108,20 +108,18 @@ class MultiAgentEnv(gym.Env):
         if self.shared_reward:
             reward_n = [reward] * self.n
 
-        if self.n == 2:
-            assert reward_n[0] == reward_n[1]
-
-        return obs_n[0], reward_n[0], done_n, info_n
+        return obs_n, reward_n, done_n, info_n
 
     def reset(self, task):
         self.reset_callback(self.world, task)
         self._reset_render()
 
-        # For meta branch, we are interested in state
-        # instead of observation. Thus, all agents receive
-        # same observation
+        # record observations for each agent
+        obs_n = []
         self.agents = self.world.policy_agents
-        return self._get_obs(self.agents[0])
+        for agent in self.agents:
+            obs_n.append(self._get_obs(agent))
+        return obs_n
 
     # get info used for benchmarking
     def _get_info(self, agent):
