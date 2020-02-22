@@ -110,7 +110,7 @@ class MultiAgentEnv(gym.Env):
 
         return obs_n, reward_n, done_n, info_n
 
-    def reset(self, task):
+    def reset(self, task=None):
         self.reset_callback(self.world, task)
         self._reset_render()
 
@@ -330,17 +330,16 @@ class BatchMultiAgentEnv(gym.Env):
     def observation_space(self):
         return self.env_batch[0].observation_space
 
-    def step(self, action_n, time):
+    def step(self, action_n):
         obs_n = []
         reward_n = []
         done_n = []
         info_n = {'n': []}
         i = 0
         for env in self.env_batch:
-            obs, reward, done, _ = env.step(action_n[i:(i + env.n)], time)
+            obs, reward, done, _ = env.step(action_n[i:(i + env.n)])
             i += env.n
             obs_n += obs
-            # reward = [r / len(self.env_batch) for r in reward]
             reward_n += reward
             done_n += done
         return obs_n, reward_n, done_n, info_n
@@ -357,3 +356,7 @@ class BatchMultiAgentEnv(gym.Env):
         for env in self.env_batch:
             results_n += env.render(mode, close)
         return results_n
+
+    def seed(self, seed):
+        random.seed(seed)
+        np.random.seed(seed)

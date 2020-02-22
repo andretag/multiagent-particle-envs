@@ -6,6 +6,7 @@ from multiagent.scenario import BaseScenario
 class Scenario(BaseScenario):
     def make_world(self):
         world = World()
+        world.clip_positions = True
         # add agents
         world.agents = [Agent() for i in range(1)]
         for i, agent in enumerate(world.agents):
@@ -22,7 +23,7 @@ class Scenario(BaseScenario):
         self.reset_world(world)
         return world
 
-    def reset_world(self, world):
+    def reset_world(self, world, task=None):
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.25, 0.25, 0.25])
