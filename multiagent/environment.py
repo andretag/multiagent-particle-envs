@@ -273,12 +273,16 @@ class MultiAgentEnv(gym.Env):
                 pos = np.zeros(self.world.dim_p)
             else:
                 pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
+            self.viewers[i].set_bounds(
+                pos[0] - cam_range, 
+                pos[0] + cam_range, 
+                pos[1] - cam_range, 
+                pos[1] + cam_range)
             # update geometry positions
             for e, entity in enumerate(vis_entities):
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
             # render to display or array
-            results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
+            results.append(self.viewers[i].render(return_rgb_array=(mode == 'rgb_array')))
 
         return results
 
@@ -299,7 +303,7 @@ class MultiAgentEnv(gym.Env):
         if receptor_type == 'grid':
             for x in np.linspace(-range_max, +range_max, 5):
                 for y in np.linspace(-range_max, +range_max, 5):
-                    dx.append(np.array([x,y]))
+                    dx.append(np.array([x, y]))
         return dx
 
 
@@ -308,7 +312,7 @@ class MultiAgentEnv(gym.Env):
 class BatchMultiAgentEnv(gym.Env):
     metadata = {
         'runtime.vectorized': True,
-        'render.modes' : ['human', 'rgb_array']
+        'render.modes': ['human', 'rgb_array']
     }
 
     def __init__(self, env_batch):
@@ -333,7 +337,7 @@ class BatchMultiAgentEnv(gym.Env):
         info_n = {'n': []}
         i = 0
         for env in self.env_batch:
-            obs, reward, done, _ = env.step(action_n[i:(i+env.n)], time)
+            obs, reward, done, _ = env.step(action_n[i:(i + env.n)], time)
             i += env.n
             obs_n += obs
             # reward = [r / len(self.env_batch) for r in reward]
