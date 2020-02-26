@@ -335,19 +335,18 @@ class BatchMultiAgentEnv(gym.Env):
         reward_n = []
         done_n = []
         info_n = {'n': []}
-        i = 0
-        for env in self.env_batch:
-            obs, reward, done, _ = env.step(action_n[i:(i + env.n)])
-            i += env.n
-            obs_n += obs
-            reward_n += reward
-            done_n += done
+        for i_env, env in enumerate(self.env_batch):
+            # obs, reward, done, _ = env.step(action_n[i:(i + env.n)])
+            obs, reward, done, _ = env.step(action_n[i_env, :, :])
+            obs_n.append(obs)
+            reward_n.append(reward)
+            done_n.append(done)
         return obs_n, reward_n, done_n, info_n
 
-    def reset(self):
+    def reset(self, task=None):
         obs_n = []
         for env in self.env_batch:
-            obs_n += env.reset()
+            obs_n.append(env.reset(task))
         return obs_n
 
     # render environment
