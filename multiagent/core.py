@@ -185,8 +185,8 @@ class World(object):
             if not entity.movable:
                 continue
             entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
-            if "box" in entity.name and not self.check_all_agent_in_contact(entity):
-                entity.state.p_vel *= 2.  # If two agents push together, then faster box speed
+            # if "box" in entity.name and not self.check_all_agent_in_contact(entity):
+            #     entity.state.p_vel *= 2.  # If two agents push together, then faster box speed
             if (p_force[i] is not None):
                 entity.state.p_vel += (p_force[i] / entity.mass) * self.dt
             if entity.max_speed is not None:
@@ -217,7 +217,7 @@ class World(object):
             return [None, None]  # don't collide against itself
         # compute actual distance between entities
         delta_pos = entity_a.state.p_pos - entity_b.state.p_pos
-        dist = np.sqrt(np.sum(np.square(delta_pos)))
+        dist = np.sqrt(np.sum(np.square(delta_pos))) + 1e-5
         # minimum allowable distance
         dist_min = entity_a.size + entity_b.size
         # softmax penetration

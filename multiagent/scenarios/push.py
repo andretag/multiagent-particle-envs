@@ -9,7 +9,7 @@ class Scenario(BaseScenario):
         world.collaborative = True
         world.clip_positions = True
 
-        world.agents = [Agent() for i in range(2)]
+        world.agents = [Agent() for i in range(args.n_agent)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.collide = True
@@ -21,8 +21,8 @@ class Scenario(BaseScenario):
             box.name = 'box %d' % i
             box.collide = True
             box.movable = True
-            box.size = 0.25
-            box.initial_mass = 5.
+            box.size = 0.35
+            box.initial_mass = 7.
             box.index = i
             world.landmarks.append(box)
 
@@ -54,6 +54,7 @@ class Scenario(BaseScenario):
                 raise NotImplementedError()
 
             agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
+            agent.state.p_pos[0] = np.random.uniform(0.20, +1., world.dim_p)[0]
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
@@ -62,7 +63,7 @@ class Scenario(BaseScenario):
             landmark.state.p_vel = np.zeros(world.dim_p)
 
             if "box" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.35, 0.0])  # Box
+                landmark.state.p_pos = np.array([-0.15, 0.0])  # Box
             elif "target" in landmark.name and landmark.index == 0:
                 landmark.state.p_pos = np.array([-0.85, 0.0])  # Left target
             else:
