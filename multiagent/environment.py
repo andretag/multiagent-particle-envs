@@ -336,8 +336,12 @@ class BatchMultiAgentEnv(gym.Env):
         done_n = []
         info_n = {'n': []}
         for i_env, env in enumerate(self.env_batch):
-            # obs, reward, done, _ = env.step(action_n[i:(i + env.n)])
-            obs, reward, done, _ = env.step(action_n[i_env, :, :])
+            if len(action_n.shape) == 2:
+                obs, reward, done, _ = env.step(action_n[i_env, :])
+            elif len(action_n.shape) == 3:
+                obs, reward, done, _ = env.step(action_n[i_env, :, :])
+            else:
+                raise ValueError()
             obs_n.append(obs)
             reward_n.append(reward)
             done_n.append(done)
