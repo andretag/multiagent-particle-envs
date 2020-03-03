@@ -46,12 +46,11 @@ class Scenario(BaseScenario):
         for i, agent in enumerate(world.agents):
             if i == 0:
                 agent.color = np.array([1., 0., 0.])  # Red
-                agent.state.p_pos = np.array([0.5, 0.5])  # Box
             elif i == 1:
                 agent.color = np.array([0., 1., 0.])  # Blue
-                agent.state.p_pos = np.array([0.5, -0.5])  # Box
             else:
                 raise NotImplementedError()
+            agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
