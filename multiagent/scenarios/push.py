@@ -95,4 +95,4 @@ class Scenario(BaseScenario):
         for agent in world.agents:
             agent_pos.append(agent.state.p_pos)
 
-        return np.concatenate(entity_pos + agent_pos + [np.array([self.task])])
+        return np.concatenate(entity_pos + agent_pos)
