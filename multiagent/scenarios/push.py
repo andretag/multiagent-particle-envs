@@ -22,7 +22,7 @@ class Scenario(BaseScenario):
             box.collide = True
             box.movable = True
             box.size = 0.35
-            box.initial_mass = 8.
+            box.initial_mass = 9.
             box.index = i
             world.landmarks.append(box)
 
