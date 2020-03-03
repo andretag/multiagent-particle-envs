@@ -35,7 +35,7 @@ class Scenario(BaseScenario):
             target.index = i
             world.landmarks.append(target)
 
-        self.reset_world(world, task=0.)
+        self.reset_world(world)
         return world
 
     def reset_world(self, world, task=None):
@@ -43,18 +43,15 @@ class Scenario(BaseScenario):
         Two agents are randomly initialized.
         The box and the left target are initialized at the same location on the left side
         """
-        self.task = task
-
         for i, agent in enumerate(world.agents):
             if i == 0:
                 agent.color = np.array([1., 0., 0.])  # Red
+                agent.state.p_pos = np.array([0.5, 0.5])  # Box
             elif i == 1:
                 agent.color = np.array([0., 1., 0.])  # Blue
+                agent.state.p_pos = np.array([0.5, -0.5])  # Box
             else:
                 raise NotImplementedError()
-
-            agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
-            agent.state.p_pos[0] = np.random.uniform(0.20, +1., world.dim_p)[0]
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
@@ -95,4 +92,8 @@ class Scenario(BaseScenario):
         for agent in world.agents:
             agent_pos.append(agent.state.p_pos)
 
-        return np.concatenate(entity_pos + agent_pos)
+        agent_vel = []
+        for agent in world.agents:
+            agent_vel.append(agent.state.p_vel)
+
+        return np.concatenate(entity_pos + agent_pos + agent_vel)
