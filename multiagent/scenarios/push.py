@@ -51,6 +51,7 @@ class Scenario(BaseScenario):
             else:
                 raise NotImplementedError()
             agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
+            agent.state.p_pos[0] = np.random.uniform(0.30, +1.)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
@@ -61,7 +62,7 @@ class Scenario(BaseScenario):
             if "box" in landmark.name and landmark.index == 0:
                 landmark.state.p_pos = np.array([-0.15, 0.0])  # Box
             elif "target" in landmark.name and landmark.index == 0:
-                landmark.state.p_pos = np.array([-0.85, 0.0])  # Left target
+                landmark.state.p_pos = np.array([-0.75, 0.0])  # Left target
             else:
                 raise ValueError()
 
