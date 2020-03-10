@@ -14,6 +14,7 @@ class Scenario(BaseScenario):
             agent.name = 'agent %d' % i
             agent.collide = True
             agent.silent = True
+            agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
             agent.size = 0.1  # Radius
 
         self.boxes = [Landmark() for _ in range(1)]
@@ -22,7 +23,7 @@ class Scenario(BaseScenario):
             box.collide = True
             box.movable = True
             box.size = 0.35
-            box.initial_mass = 10.
+            box.initial_mass = 12.5
             box.index = i
             world.landmarks.append(box)
 
@@ -41,7 +42,7 @@ class Scenario(BaseScenario):
     def reset_world(self, world, task=None):
         """Define random properties for agents, box, and targets.
         Two agents are randomly initialized.
-        The box and the left target are initialized at the same location on the left side
+        The box and the left target are initialized on the left side
         """
         for i, agent in enumerate(world.agents):
             if i == 0:
@@ -50,8 +51,8 @@ class Scenario(BaseScenario):
                 agent.color = np.array([0., 1., 0.])  # Blue
             else:
                 raise NotImplementedError()
-            agent.state.p_pos = np.random.uniform(-1., +1., world.dim_p)
             agent.state.p_pos[0] = np.random.uniform(0.30, +1.)
+            agent.state.p_pos[1] = np.random.uniform(-0.50, +0.50)
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
 
